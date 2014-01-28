@@ -20,3 +20,4 @@ sub check_connect : Test(2) {
   ok($sch);
 }
 
+1;
