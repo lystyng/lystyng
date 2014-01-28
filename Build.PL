@@ -1,16 +1,16 @@
 use Module::Build;
 my $build = Module::Build->new(
-	module_name => 'Lystyng',
-	license => 'perl',
-	requires => {
-		perl    => '5.10.0',
-		Carp    => 0,
-	},
-        build_requires => {
-                Test::Class => 0,
-                Test::More => 0,
-        },
-        create_makefile_pl => 'traditional',
+    module_name => 'Lystyng',
+    license => 'perl',
+    requires => {
+        perl        => '5.10.0',
+        DBIx::Class => 0,
+    },
+    build_requires => {
+        Test::Class => 0,
+        Test::More => 0,
+    },
+    create_makefile_pl => 'traditional',
 );
 
 $build->create_build_script;
