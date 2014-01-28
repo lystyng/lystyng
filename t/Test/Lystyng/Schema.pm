@@ -6,9 +6,15 @@ use Test::More;
 use lib 'lib';
 
 sub check_connect : Test(2) {
-  BAIL_OUT('Missing connection info')
-    unless $ENV{LYSTYNG_DB_SERVER} && $ENV{LYSTYNG_DB_NAME} &&
-           $ENV{LYSTYNG_DB_USER}   && $ENV{LYSTYNG_DB_PASS};
+  my @errors;
+  foreach (qw[LYSTYNG_DB_SERVER LYSTYNG_DB_NAME
+              LYSTYNG_DB_USER LYSTYNG_DB_PASS]) {
+    push @errors, $_ unless defined $ENV{$_};
+  }
+
+  if (@errors) {
+    BAIL_OUT("Missing connection info: @errors");
+  }
 
   use_ok('Lystyng::Schema');
 
