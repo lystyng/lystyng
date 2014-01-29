@@ -4,33 +4,9 @@ use base qw(Test::Class);
 use Test::More;
 use Moose;
 
-use Lystyng::Schema;
+with 'Test::Role::WithSchema';
 
-has schema => (
-  is      => 'rw',
-  isa     => 'Lystyng::Schema',
-  lazy    => 1,
-  builder => '_build_schema',
-);
-
-sub _build_schema {
-  my @errors;
-  foreach (qw[LYSTYNG_DB_SERVER LYSTYNG_DB_NAME
-              LYSTYNG_DB_USER LYSTYNG_DB_PASS]) {
-    push @errors, $_ unless defined $ENV{$_};
-  }
-
-  if (@errors) {
-    BAIL_OUT("Missing connection info: @errors");
-  }
-
-  return Lystyng::Schema->connect(
-    "dbi:mysql:hostname=$ENV{LYSTYNG_DB_SERVER};database=$ENV{LYSTYNG_DB_NAME}",
-    $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS}
-  );
-}
-
-sub create : Tests {
+sub basic : Tests {
   my $self = shift;
 
   my $user_rs = $self->schema->resultset('User');
@@ -42,6 +18,25 @@ sub create : Tests {
 
   ok($user, 'Got a user');
   isa_ok($user, 'Lystyng::Schema::Result::User');
+
+  my ($user2) = $user_rs->search({
+    username => 'user',
+  });
+
+  ok($user, 'Got another user');
+  isa_ok($user, 'Lystyng::Schema::Result::User');
+
+  foreach (qw[username password email]) {
+    is($user->$_, $user2->$_, "$_ is correct");
+  }
+
+  $user2->password('another password');
+  $user2->update;
+  # re-read from db
+  $user2->discard_changes;
+  is($user2->password, 'another password', 'Updated password is correct');
+
+  $user_rs->delete;
 }
 
 1;
