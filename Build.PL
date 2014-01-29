@@ -5,6 +5,7 @@ my $build = Module::Build->new(
     requires => {
         perl        => '5.10.0',
         DBIx::Class => 0,
+        DBD::mysql  => 0,
         Moose       => 0,
         MooseX::MarkAsMethods => 0,
         MooseX::NonMoose      => 0,
