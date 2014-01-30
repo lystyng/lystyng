@@ -1,4 +1,4 @@
-package Test::Lystyng::Schema::Result::List::Util;
+package Test::Lystyng::Schema::Result::ListItem;
 
 use base qw(Test::Class);
 use Test::More;
