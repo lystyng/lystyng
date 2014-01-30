@@ -7,8 +7,9 @@ my $build = Module::Build->new(
         DBIx::Class => 0,
         DBD::mysql  => 0,
         Moose       => 0,
-        MooseX::MarkAsMethods => 0,
-        MooseX::NonMoose      => 0,
+        MooseX::MarkAsMethods      => 0,
+        MooseX::NonMoose           => 0,
+        DBIx::Class::EncodedColumn => 0,
     },
     build_requires => {
         Test::Class => 0,

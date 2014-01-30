@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use DBIx::Class::Schema::Loader qw[make_schema_at];
+
+make_schema_at(
+  'Lystyng::Schema', {
+    dump_directory => 'lib',
+    use_moose => 1,
+    components => [ 'EncodedColumn' ],
+    custom_column_info => \&encode_password,
+  }, [
+    "dbi:mysql:dbname=$ENV{LYSTYNG_DB_NAME};host=$ENV{LYSTYNG_DB_SERVER}",
+    $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS},
+  ],
+);
+
+sub encode_password {
+  my ($table, $column_name) = @_;
+
+  if ($column_name eq 'password') {
+    return {
+      encode_column => 1,
+      encode_class  => 'Digest',
+      encode_args   => {
+        algorithm => 'SHA-1',
+        format => 'hex',
+        salt_length => 10,
+      },
+      encode_check_method => 'check_password',
+    };
+  }
+}

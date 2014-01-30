@@ -26,15 +26,16 @@ sub basic : Tests {
   ok($user, 'Got another user');
   isa_ok($user, 'Lystyng::Schema::Result::User');
 
-  foreach (qw[username password email]) {
+  foreach (qw[username email]) {
     is($user->$_, $user2->$_, "$_ is correct");
   }
+  ok($user->check_password('pass'), 'password is correct');
 
   $user2->password('another password');
   $user2->update;
   # re-read from db
   $user2->discard_changes;
-  is($user2->password, 'another password', 'Updated password is correct');
+  ok($user2->check_password('another password'), 'Updated password is correct');
 
   $user_rs->delete;
 }

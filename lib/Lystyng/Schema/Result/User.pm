@@ -18,6 +18,18 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
+=head1 COMPONENTS LOADED
+
+=over 4
+
+=item * L<DBIx::Class::EncodedColumn>
+
+=back
+
+=cut
+
+__PACKAGE__->load_components("EncodedColumn");
+
 =head1 TABLE: C<user>
 
 =cut
@@ -47,6 +59,10 @@ __PACKAGE__->table("user");
 =head2 password
 
   data_type: 'char'
+  encode_args: {algorithm => "SHA-1",format => "hex",salt_length => 10}
+  encode_check_method: 'check_password'
+  encode_class: 'Digest'
+  encode_column: 1
   is_nullable: 0
   size: 64
 
@@ -60,7 +76,15 @@ __PACKAGE__->add_columns(
   "email",
   { data_type => "varchar", is_nullable => 0, size => 200 },
   "password",
-  { data_type => "char", is_nullable => 0, size => 64 },
+  {
+    data_type           => "char",
+    encode_args         => { algorithm => "SHA-1", format => "hex", salt_length => 10 },
+    encode_check_method => "check_password",
+    encode_class        => "Digest",
+    encode_column       => 1,
+    is_nullable         => 0,
+    size                => 64,
+  },
 );
 
 =head1 PRIMARY KEY
@@ -93,8 +117,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-01-07 22:12:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:K6jCcJvzi8cOrpjW0pgYpw
+# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-01-30 20:20:50
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:dOskylIQblron+9s87lFpw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
