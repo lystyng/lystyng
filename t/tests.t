@@ -4,5 +4,6 @@ use lib 't';
 use Test::Class;
 use Test::Lystyng::Schema;
 use Test::Lystyng::Schema::Result::User;
+use Test::Lystyng::Schema::Result::List;
 
 Test::Class->runtests;
