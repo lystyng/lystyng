@@ -5,6 +5,7 @@ use warnings;
 use 5.010;
 
 use Moose::Role;
+use Test::More;
 
 use Lystyng::Schema;
 

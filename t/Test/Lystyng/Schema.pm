@@ -16,4 +16,12 @@ sub check_connect : Tests {
   isa_ok($sch, 'Lystyng::Schema');
 }
 
+sub check_rs : Tests {
+  my $sch = shift->schema;
+
+  foreach (qw[User List ListItem]) {
+    ok(my $rs = $sch->resultset($_), "Got resultset for $_");
+  }
+}
+
 1;
