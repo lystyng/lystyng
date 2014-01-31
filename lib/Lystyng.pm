@@ -6,6 +6,12 @@ Lystyng - Code for listing things
 
 package Lystyng;
 
+use Dancer ':syntax';
 our $VERSION = '0.0.1';
 
-1;
+get '/' => sub {
+    template 'index';
+};
+
+true;
+
