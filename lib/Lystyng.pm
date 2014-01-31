@@ -10,7 +10,7 @@ use Dancer ':syntax';
 our $VERSION = '0.0.1';
 use Dancer::Plugin::DBIC qw[schema resultset];
 
-$ENV{LYSTYNG_DB_USER} && $ENV{LYSTYNG_DB_PASS}
+defined $ENV{LYSTYNG_DB_USER} && defined $ENV{LYSTYNG_DB_PASS}
   or die 'Must set LYSTYNG_DB_USER and LYSTYNG_DB_PASS';
 
 my $cfg = setting('plugins');
