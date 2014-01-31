@@ -9,6 +9,7 @@ my $build = Module::Build->new(
         Moose       => 0,
         YAML        => 0,
         Dancer      => 1,
+        Template    => 1,
         Dancer::Plugin::DBIC       => 0,
         MooseX::MarkAsMethods      => 0,
         MooseX::NonMoose           => 0,
