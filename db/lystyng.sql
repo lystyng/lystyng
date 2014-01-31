@@ -1,6 +1,7 @@
 create table `user` (
   id integer primary key auto_increment,
   username varchar(20) not null,
+  name varchar(100) not null,
   email varchar(200) not null,
   password char(64) not null
 ) ENGINE=INNODB CHARSET=utf8;

@@ -1,0 +1,16 @@
+[% IF errors -%]
+<ul>
+[%   FOREACH error IN errors -%]
+<li>[% error %]</li>
+[%   END -%]
+[% END -%]
+<form method="post" action="/register">
+<table>
+  <tr><th>Username:</th><td><input name="username" value="[% params.username %]"></td></tr>
+  <tr><th>Email:</th><td><input name="email" value="[% params.email %]"></td></tr>
+  <tr><th>Name:</th><td><input name="name" value="[% params.name %]"></td></tr>
+  <tr><th>Password:</th><td><input name="password" value="[% params.password %]"></td></tr>
+  <tr><th>Confirm Password:</th><td><input name="password2" value="[% params.password2 %]"></td></tr>
+  <tr><td colspan="2"><input type="submit"></td></tr>
+</table>
+</form>

@@ -1,0 +1,10 @@
+[% IF error -%]
+<p>That username and/or password is incorrect.</p>
+[% END -%]
+<form method="post" action="/login">
+<table>
+  <tr><th>Username:</th><td><input name="username" value="[% params.username %]"></td></tr>
+  <tr><th>Password:</th><td><input name="password" value="[% params.password %]"></td></tr>
+  <tr><td colspan="2"><input type="submit"></td></tr>
+</table>
+</form>
