@@ -1,25 +1,26 @@
 <html>
   <head>
     <title>Travis-CI Widget Test</title>
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
   </head>
   <body>
     <h1>Travis-CI Widget Test</h1>
     <div id="here"></div>
     <script type="text/javascript">
 (function() {
-  alert("Hello");
   $.getJSON( "https://api.travis-ci.org/repos/davorg/lystyng/builds", function( data ) {
     var items = [];
-    $.each( data, function( build ) {
-      items.push( "<li id='" + build.id + "'>" + build.number + "</li>" );
+    $.each( data, function( index, build ) {
+      if (index < 5) {
+        items.push( "<li id='" + build.id + "'><a href=\"\">Build " +
+                    build.number + "</a>" + "</li>" );
+      }
     });
-    $( "<ul/>", {
+    $( "<ol/>", {
       "class": "my-new-list",
       html: items.join( "" )
     }).appendTo( "body" );
   });
-  alert("Goodbye");
 })();
     </script>
   </body>
