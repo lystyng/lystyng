@@ -1,3 +1,3 @@
 Code for lystyng.com.
 
-Here's our current build status, which is hopefully green: [![Build Status](https://secure.travis-ci.org/github/lystyng.png?branch=master)](http://travis-ci.org/github/lystyng)
+Here's our current build status, which is hopefully green: [![Build Status](https://travis-ci.org/davorg/lystyng.png?branch=master)](http://travis-ci.org/davorg/lystyng)
