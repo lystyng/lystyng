@@ -1,9 +1,14 @@
+<div class="col-md-4">
 [% IF error -%]
-<p>That username and/or password is incorrect.</p>
+<div class="alert alert-danger fade-in">
+That username and/or password is incorrect.
+<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+</div>
 [% END -%]
 <form class="form-signin" role="form" method="post" action="/login">
   <h2 class="form-signin-heading">Please sign in</h2>
   <input type="text" class="form-control" placeholder="Username" name="username" value="[% params.username %]" required autofocus>
-  <input type="password" class="form-control" placeholder="Password" name="passoword" value="[% params.password %]" required>
-  <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  <input type="password" class="form-control" placeholder="Password" name="password" value="[% params.password %]" required>
+  <button class="btn btn-primary btn-block" type="submit">Sign in</button>
 </form>
+</div>

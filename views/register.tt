@@ -1,16 +1,49 @@
+<div class="col-md-6">
 [% IF errors -%]
-<ul>
+  <div class="alert alert-danger fade-in">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <ul>
 [%   FOREACH error IN errors -%]
-<li>[% error %]</li>
+      <li>[% error %]</li>
 [%   END -%]
+    </ul>
+  </div>
 [% END -%]
-<form method="post" action="/register">
-<table>
-  <tr><th>Username:</th><td><input name="username" value="[% params.username %]"></td></tr>
-  <tr><th>Email:</th><td><input name="email" value="[% params.email %]"></td></tr>
-  <tr><th>Name:</th><td><input name="name" value="[% params.name %]"></td></tr>
-  <tr><th>Password:</th><td><input name="password" value="[% params.password %]"></td></tr>
-  <tr><th>Confirm Password:</th><td><input name="password2" value="[% params.password2 %]"></td></tr>
-  <tr><td colspan="2"><input type="submit"></td></tr>
-</table>
-</form>
+  <form role="form" class="form-horizontal">
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="username">Username</label>
+      <div class="col-md-6">
+        <input type="text" class="form-control" id="username" name="username" value="[% params.username %]" placeholder="username">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="email">Email</label>
+      <div class="col-md-6">
+        <input type="email" class="col-md-4 form-control" id="email" name="email" value="[% params.email %]" placeholder="email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="name">Name</label>
+      <div class="col-md-6">
+        <input type="text" class="col-md-4 form-control" id="name" name="name" value="[% params.name %]" placeholder="name">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="password">Password</label>
+      <div class="col-md-6">
+        <input type="password" class="col-md-4 form-control" id="password" name="password" value="[% params.password %]" placeholder="password">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="password2">Confirm Password</label>
+      <div class="col-md-6">
+        <input type="password" class="col-md-4 form-control" id="password2" name="password2" value="[% params.password2 %]" placeholder="confirm password">
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-md-offset-2 col-md-4">
+        <button type="submit" class="btn btn-primary btn-block">Register</button>
+      </div>
+    </div>
+  </form>
+</div>

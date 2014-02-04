@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="[% settings.charset %]">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lystyng</title>
-  <link rel="stylesheet" href="[% request.uri_base %]/css/bootstrap.min.css" />
+  <head>
+    <meta charset="[% settings.charset %]">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lystyng</title>
+    <link rel="stylesheet" href="[% request.uri_base %]/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="[% request.uri_base %]/css/bootstrap-theme.min.css">
 
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
-<script type="text/javascript">/* <![CDATA[ */
+    <![endif]-->
+    <script type="text/javascript">/* <![CDATA[ */
     !window.jQuery && document.write('<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.js"><\/script>')
 /* ]]> */</script>
-  <script src="js/bootstrap.min.js"></script>
-</head>
-<body>
-  <div class="container">
+    <script src="js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
       <!-- Static navbar -->
-      <div class="navbar navbar-default" role="navigation">
+      <div class="navbar navbar-inverse" role="navigation">
         <div class="container-fluid">
           <div class="navbar-header">
             <a class="navbar-brand" href="#">Lystyng</a>
@@ -29,8 +30,7 @@
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
 [% IF session.user -%]
-              <li>Welcome [% session.user.name %]</li>
-              <li><a href="/logout">Log out</a></li>
+              <li>Welcome [% session.user.name %] <a href="/logout">Log out</a></li>
 [% ELSE -%]
               <li><a href="/register">Register</a> / <a href="/login">Log in</a></li>
 [% END -%]
@@ -38,10 +38,14 @@
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
       </div>
+      <div class="container">
 [% content %]
-  <div id="footer">
-  Powered by <a href="http://perldancer.org/">Dancer</a> [% dancer_version %]
-  </div>
-  </div>
-</body>
+      </div>
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted">Powered by <a href="http://perldancer.org/">Dancer</a> [% dancer_version %]</p>
+      </div>
+    </div>
+  </body>
 </html>
