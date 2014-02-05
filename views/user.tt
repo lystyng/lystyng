@@ -1,0 +1,10 @@
+<h2>[% user.username %]</h2>
+[% IF user.lists.size -%]
+<ul>
+[%   FOREACH list IN user.lists -%]
+<li><a href="/user/[% user.username %]/list/[% list.slug %]">[% list.title %]</a>
+<br>[% list.description %]</li>
+[%   END -%]
+[% ELSE -%]
+<p>User has no lists</p>
+[% END -%]

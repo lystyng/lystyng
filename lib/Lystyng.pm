@@ -22,6 +22,43 @@ get '/' => sub {
   template 'index';
 };
 
+get '/user' => sub {
+  template 'users', {
+    users => resultset('User')->all,
+  };
+};
+
+get '/user/:username' => sub {
+  if (my $user = resultset('User')->find({
+    username => params->{username},
+  })) {
+    template 'user', {
+      user => $user,
+    };
+  } else {
+    send_error 'User not found', 404;
+  }
+};
+
+get '/user/:username/list/:list' => sub {
+  my $user;
+  unless ($user = resultset('User')->find({
+    username => params->{username},
+  })) {
+    send_error 'User not found', 404;
+  };
+
+  if (my $list = $user->lists->find({
+    slug => params->{list},
+  })) {
+    template 'list', {
+      list => $list,
+    };
+  } else {
+    send_error 'List not found', 404;
+  };
+};
+
 get '/register' => sub {
   template 'register';
 };

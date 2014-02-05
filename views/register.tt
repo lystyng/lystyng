@@ -9,7 +9,7 @@
     </ul>
   </div>
 [% END -%]
-  <form role="form" class="form-horizontal">
+  <form role="form" class="form-horizontal" method="post" action="/register">
     <div class="form-group">
       <label class="col-md-2 control-label" for="username">Username</label>
       <div class="col-md-6">

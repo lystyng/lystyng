@@ -1,0 +1,12 @@
+<h2>[% list.title %]</h2>
+<p>By <a href="">[% list.user.username %]</a></p>
+<p>[% list.description %]</p>
+[% IF list.list_items.size -%]
+<ul>
+[%   FOREACH item IN list.list_items -%]
+<li><h3>[% item.title %]</h3>
+<p>[% item.description %]</p></li>
+[%   END -%]
+[% ELSE -%]
+<p>List has no items</p>
+[% END -%]
