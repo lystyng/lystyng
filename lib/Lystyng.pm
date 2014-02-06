@@ -10,21 +10,23 @@ use Dancer ':syntax';
 our $VERSION = '0.0.1';
 use Dancer::Plugin::DBIC qw[schema resultset];
 
-defined $ENV{LYSTYNG_DB_USER} && defined $ENV{LYSTYNG_DB_PASS}
-  or die 'Must set LYSTYNG_DB_USER and LYSTYNG_DB_PASS';
+hook before => sub {
+  defined $ENV{LYSTYNG_DB_USER} && defined $ENV{LYSTYNG_DB_PASS}
+    or die 'Must set LYSTYNG_DB_USER and LYSTYNG_DB_PASS';
 
-my $cfg = setting('plugins');
-$cfg->{DBIC}{default}{user} = $ENV{LYSTYNG_DB_USER};
-$cfg->{DBIC}{default}{pass} = $ENV{LYSTYNG_DB_PASS};
-
+  my $cfg = setting('plugins');
+  $cfg->{DBIC}{default}{user} = $ENV{LYSTYNG_DB_USER};
+  $cfg->{DBIC}{default}{pass} = $ENV{LYSTYNG_DB_PASS};
+};
 
 get '/' => sub {
   template 'index';
 };
 
 get '/user' => sub {
+  my @users = resultset('User')->all;
   template 'users', {
-    users => resultset('User')->all,
+    users => \@users,
   };
 };
 
