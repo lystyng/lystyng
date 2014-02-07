@@ -33,6 +33,8 @@ get '/user' => sub {
 get '/user/:username' => sub {
   if (my $user = resultset('User')->find({
     username => params->{username},
+  }, {
+    prefetch => 'lists'
   })) {
     template 'user', {
       user => $user,
