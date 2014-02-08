@@ -44,6 +44,24 @@ get '/user/:username' => sub {
   }
 };
 
+get '/user/:username/list/add' => sub {
+  redirect '/login' unless session->{user};
+
+  template 'addlist';
+};
+
+post '/user/:username/list/add' => sub {
+  redirect '/login' unless session->{user};
+
+  session->{user}->add_to_lists({
+    title       => params->{list_title},
+    slug        => params->{list_slug},
+    description => params->{list_description},
+  });
+
+  redirect '/user/' . session->{user}->username;
+};
+
 get '/user/:username/list/:list' => sub {
   my $user;
   unless ($user = resultset('User')->find({
@@ -105,7 +123,7 @@ post '/login' => sub {
   my ($user) = $user_rs->find({ username => param('username') });
   if ($user && $user->check_password(param('password'))) {
     session user => $user;
-    redirect '/';
+    redirect '/user/' . $user->username;
   } else {
     template 'login', {
       error    => 1,

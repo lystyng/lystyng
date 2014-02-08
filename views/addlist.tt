@@ -1,0 +1,30 @@
+[% fields = [ {
+  name  => 'list_title',
+  label => 'List Title',
+  placeholder => 'title',
+}, {
+  name  => 'list_slug',
+  label => 'Slug',
+  placeholder => 'slug',
+}, {
+  name  => 'list_description',
+  label => 'Description',
+  placeholder => 'description',
+} ] -%]
+
+<h2>Add List</h2>
+  <form role="form" class="form-horizontal" method="post" action="/user/[% session.user.username %]/list/add">
+[% FOREACH field IN fields -%]
+    <div class="form-group">
+      <label class="col-md-2 control-label" for="[% field.name %]">[% field.label %]</label>
+      <div class="col-md-6">
+        <input type="text" class="form-control" id="[% field.name %]" name="[% field.name %]" value="[% params.${field.name} %]" placeholder="[% field.placeholder %]">
+      </div>
+    </div>
+[% END -%]
+    <div class="form-group">
+      <div class="col-md-offset-2 col-md-4">
+        <button type="submit" class="btn btn-primary btn-block">Add</button>
+      </div>
+    </div>
+  </form>

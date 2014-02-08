@@ -1,5 +1,5 @@
 <h2>[% list.title %]</h2>
-<p>By <a href="">[% list.user.username %]</a></p>
+<p>By <a href="/user/[% list.user.username %]">[% list.user.username %]</a></p>
 <p>[% list.description %]</p>
 [% IF list.list_items.size -%]
 <ul>
