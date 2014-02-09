@@ -88,6 +88,17 @@ get '/register' => sub {
 post '/register' => sub {
   my $user_rs = resultset('User');
   my @errors;
+
+  foreach (qw[username name email password password2]) {
+    push @errors, qq[Field "$_" is missing] unless defined param($_);
+  }
+
+  if (@errors) {
+    return template 'register', {
+      errors => \@errors,
+    };
+  }
+
   if (param('password') ne param('password2')) {
     push @errors, 'Your passwords do not match.';
   }
