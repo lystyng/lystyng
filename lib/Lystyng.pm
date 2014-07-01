@@ -15,8 +15,8 @@ hook before => sub {
     or die 'Must set LYSTYNG_DB_USER and LYSTYNG_DB_PASS';
 
   my $cfg = setting('plugins');
-  $cfg->{DBIC}{default}{user} = $ENV{LYSTYNG_DB_USER};
-  $cfg->{DBIC}{default}{pass} = $ENV{LYSTYNG_DB_PASS};
+  $cfg->{DBIC}{default}{user}     = $ENV{LYSTYNG_DB_USER};
+  $cfg->{DBIC}{default}{password} = $ENV{LYSTYNG_DB_PASS};
 };
 
 get '/' => sub {
