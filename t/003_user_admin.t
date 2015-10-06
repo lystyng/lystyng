@@ -1,14 +1,17 @@
-use Test::More;
 use strict;
 use warnings;
 
+use Test::More;
+use Plack::Test;
+use HTTP::Request::Common;
+
 use lib 'lib';
-
-# the order is important
 use Lystyng;
-use Dancer::Test;
-
 use Lystyng::Schema;
+
+my $app = Lystyng->to_app;
+my $test = Plack::Test->create($app);
+
 my $sch = Lystyng::Schema->connect(
   "dbi:mysql:database=$ENV{LYSTYNG_DB_NAME}",
   $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS},
@@ -21,10 +24,10 @@ my %route = (
 );
 
 for (keys %route) {
-  route_exists [ GET => "/$_" ], "a get route handler is defined for /$_";
-  response_status_is ['GET' => "/$_"], $route{$_},
-    "response status is $route{$_} for /$_";
+  my $res = $test->request( GET "/$_");
+  is( $res->code, $route{$_}, "response status is $route{$_} for /$_" );
 }
+
 
 my $user_hash = {
   username  => 'test',
@@ -33,30 +36,25 @@ my $user_hash = {
   password  => 'TEST',
 };
 
-my $response = dancer_response POST => '/register', {
-  params => $user_hash,
-};
+my $res = $test->request(POST '/register', [ %$user_hash ]);
 
-ok $response, 'Got a response from /register';
-is $response->status, 200, 'Response is 200';
-like $response->content, qr[is missing], 'Password2 is missing';
+ok $res, 'Got a response from /register';
+is $res->code, 200, 'Response is 200';
+like $res->content, qr[is missing], 'Password2 is missing';
 
 $user_hash->{password2} = 'Something else';
-$response = dancer_response POST => '/register', {
-  params => $user_hash,
-};
 
-ok $response, 'Got a response from /register';
-is $response->status, 200, 'Response is 200';
-like $response->content, qr[do not match], 'Passwords do not match';
+$res = $test->request(POST '/register', [ %$user_hash ]);
+
+ok $res, 'Got a response from /register';
+is $res->code, 200, 'Response is 200';
+like $res->content, qr[do not match], 'Passwords do not match';
 
 $user_hash->{password2} = 'TEST';
-$response = dancer_response POST => '/register', {
-  params => $user_hash,
-};
+$res = $test->request(POST '/register', [ %$user_hash ]);
 
-ok $response, 'Got a response from /register';
-is $response->status, 302, 'Response is 302';
+ok $res, 'Got a response from /register';
+is $res->code, 302, 'Response is 302';
 
 $sch->resultset('User')->delete;
 

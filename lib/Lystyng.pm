@@ -6,17 +6,17 @@ Lystyng - Code for listing things
 
 package Lystyng;
 
-use Dancer ':syntax';
+use Dancer2;
 our $VERSION = '0.0.1';
-use Dancer::Plugin::DBIC qw[schema resultset];
+use Dancer2::Plugin::DBIC qw[schema resultset];
+
+defined $ENV{LYSTYNG_DB_USER} && defined $ENV{LYSTYNG_DB_PASS}
+  or die 'Must set LYSTYNG_DB_USER and LYSTYNG_DB_PASS';
 
 hook before => sub {
-  defined $ENV{LYSTYNG_DB_USER} && defined $ENV{LYSTYNG_DB_PASS}
-    or die 'Must set LYSTYNG_DB_USER and LYSTYNG_DB_PASS';
-
-  my $cfg = setting('plugins');
-  $cfg->{DBIC}{default}{user}     = $ENV{LYSTYNG_DB_USER};
-  $cfg->{DBIC}{default}{password} = $ENV{LYSTYNG_DB_PASS};
+  my $cfg = dancer_app->config;
+  $cfg->{plugins}{DBIC}{default}{user}     = $ENV{LYSTYNG_DB_USER};
+  $cfg->{plugins}{DBIC}{default}{password} = $ENV{LYSTYNG_DB_PASS};
 };
 
 get '/' => sub {
@@ -86,7 +86,6 @@ get '/register' => sub {
 };
 
 post '/register' => sub {
-  my $user_rs = resultset('User');
   my @errors;
 
   foreach (qw[username name email password password2]) {
@@ -102,6 +101,7 @@ post '/register' => sub {
   if (param('password') ne param('password2')) {
     push @errors, 'Your passwords do not match.';
   }
+  my $user_rs = resultset('User');
   my ($user) = $user_rs->find({ username => param('username') });
   if ($user) {
     push @errors, 'Username ' . $user->username . ' is already in use.';
