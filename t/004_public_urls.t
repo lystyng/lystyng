@@ -1,14 +1,17 @@
-use Test::More;
 use strict;
 use warnings;
+use Test::More;
+use Plack::Test;
+use HTTP::Request::Common;
 
 use lib 'lib';
 
-# the order is important
 use Lystyng;
-use Dancer::Test;
 
 use Lystyng::Schema;
+
+my $app = Lystyng->to_app;
+my $test = Plack::Test->create($app);
 
 my %route = (
   ''       => 200,
@@ -18,8 +21,8 @@ my %route = (
 );
 
 for (keys %route) {
-  route_exists [ GET => "/$_" ], "a get route handler is defined for /$_";
-  response_status_is ['GET' => "/$_"], $route{$_},
+  my $res = $test->request( GET "/$_" );
+  is $res->code, $route{$_},
     "response status is $route{$_} for /$_";
 }
 
@@ -35,10 +38,8 @@ my $user = $sch->resultset('User')->create({
   email    => 'test@example.com',
 });
 
-route_exists [ GET => '/user/test' ],
-             'a get route is now defined for /user/test';
-response_status_is [ GET => '/user/test' ], 200,
-                   'response status is 200 for /user/test';
+my $res = $test->request(GET '/user/test');
+is $res->code, 200, 'response status is 200 for /user/test';
 
 $user->delete;
 
