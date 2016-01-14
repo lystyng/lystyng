@@ -16,5 +16,23 @@ __PACKAGE__->load_namespaces;
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
+
+sub get_schema {
+  my @errors;
+  foreach (qw[LYSTYNG_DB_SERVER LYSTYNG_DB_NAME
+              LYSTYNG_DB_USER LYSTYNG_DB_PASS]) {
+    push @errors, $_ unless defined $ENV{$_};
+  }
+
+  if (@errors) {
+    die("Missing connection info: @errors");
+  }
+
+  return __PACKAGE__->connect(
+    "dbi:mysql:hostname=$ENV{LYSTYNG_DB_SERVER};database=$ENV{LYSTYNG_DB_NAME}",
+    $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS}
+  );
+}
+
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 1;

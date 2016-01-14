@@ -12,10 +12,8 @@ use Lystyng::Schema;
 my $app = Lystyng->to_app;
 my $test = Plack::Test->create($app);
 
-my $sch = Lystyng::Schema->connect(
-  "dbi:mysql:database=$ENV{LYSTYNG_DB_NAME}",
-  $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS},
-);
+my $sch = eval { Lystyng::Schema->get_schema };
+BAIL_OUT($@) if $@;
 
 my %route = (
   register => 200,

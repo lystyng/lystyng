@@ -17,20 +17,9 @@ has schema => (
 );
 
 sub _build_schema {
-  my @errors;
-  foreach (qw[LYSTYNG_DB_SERVER LYSTYNG_DB_NAME
-              LYSTYNG_DB_USER LYSTYNG_DB_PASS]) {
-    push @errors, $_ unless defined $ENV{$_};
-  }
-
-  if (@errors) {
-    BAIL_OUT("Missing connection info: @errors");
-  }
-
-  return Lystyng::Schema->connect(
-    "dbi:mysql:hostname=$ENV{LYSTYNG_DB_SERVER};database=$ENV{LYSTYNG_DB_NAME}",
-    $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS}
-  );
+  my $schema = eval { Lystyng::Schema->get_schema };
+  BAIL_OUT($@) if $@;
+  return $schema;
 }
 
 1;

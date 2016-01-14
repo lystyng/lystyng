@@ -26,11 +26,8 @@ for (keys %route) {
     "response status is $route{$_} for /$_";
 }
 
-my $sch = Lystyng::Schema->connect(
-  "dbi:mysql:database=$ENV{LYSTYNG_DB_NAME}",
-  $ENV{LYSTYNG_DB_USER},                                 
-  $ENV{LYSTYNG_DB_PASS},
-) or BAIL_OUT("Can't connect to database");
+my $sch = eval { Lystyng::Schema->get_schema };
+BAIL_OUT("Can't connect to database: $@") if $@;
 
 my $user = $sch->resultset('User')->create({
   username => 'test',
