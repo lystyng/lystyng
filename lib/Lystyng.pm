@@ -121,7 +121,7 @@ post '/register' => sub {
 
     session user => $user;
 
-    redirect '/';
+    redirect '/user/' . $user->username;
   }
 };
 
@@ -148,4 +148,3 @@ get '/logout' => sub {
 };
 
 true;
-
