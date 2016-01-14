@@ -45,21 +45,21 @@ get '/user/:username' => sub {
 };
 
 get '/user/:username/list/add' => sub {
-  redirect '/login' unless session->{user};
+  redirect '/login' unless session('user');
 
   template 'addlist';
 };
 
 post '/user/:username/list/add' => sub {
-  redirect '/login' unless session->{user};
+  redirect '/login' unless session('user');
 
-  session->{user}->add_to_lists({
+  session('user')->add_to_lists({
     title       => params->{list_title},
     slug        => params->{list_slug},
     description => params->{list_description},
   });
 
-  redirect '/user/' . session->{user}->username;
+  redirect '/user/' . session('user')->username;
 };
 
 get '/user/:username/list/:list' => sub {
