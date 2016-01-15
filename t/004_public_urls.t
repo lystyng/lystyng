@@ -33,6 +33,7 @@ my $user = $sch->resultset('User')->create({
   username => 'test',
   name     => 'Test User',
   email    => 'test@example.com',
+  password => 'TEST',
 });
 
 my $res = $test->request(GET '/user/test');
