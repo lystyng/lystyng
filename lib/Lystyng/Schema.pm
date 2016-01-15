@@ -17,7 +17,7 @@ __PACKAGE__->load_namespaces;
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
-sub get_schema {
+sub check_env {
   my @errors;
   foreach (qw[LYSTYNG_DB_SERVER LYSTYNG_DB_NAME
               LYSTYNG_DB_USER LYSTYNG_DB_PASS]) {
@@ -27,6 +27,10 @@ sub get_schema {
   if (@errors) {
     die("Missing connection info: @errors");
   }
+}
+
+sub get_schema {
+  __PACKAGE__->check_env();
 
   return __PACKAGE__->connect(
     "dbi:mysql:hostname=$ENV{LYSTYNG_DB_SERVER};database=$ENV{LYSTYNG_DB_NAME}",

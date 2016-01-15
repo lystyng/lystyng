@@ -9,14 +9,16 @@ package Lystyng;
 use Dancer2;
 our $VERSION = '0.0.1';
 use Dancer2::Plugin::DBIC qw[schema resultset];
+use Lystyng::Schema;
 
-defined $ENV{LYSTYNG_DB_USER} && defined $ENV{LYSTYNG_DB_PASS}
-  or die 'Must set LYSTYNG_DB_USER and LYSTYNG_DB_PASS';
+Lystyng::Schema->check_env();
 
 hook before => sub {
   my $cfg = dancer_app->config;
   $cfg->{plugins}{DBIC}{default}{user}     = $ENV{LYSTYNG_DB_USER};
   $cfg->{plugins}{DBIC}{default}{password} = $ENV{LYSTYNG_DB_PASS};
+  $cfg->{plugins}{DBIC}{default}{dsn}      =
+    "dbi:mysql:dbname=$ENV{LYSTYNG_DB_NAME};hostname=$ENV{LYSTYNG_DB_SERVER}";
 };
 
 get '/' => sub {
