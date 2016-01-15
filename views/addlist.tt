@@ -13,7 +13,7 @@
 } ] -%]
 
 <h2>Add List</h2>
-  <form role="form" class="form-horizontal" method="post" action="/user/[% session.user.username %]/list/add">
+  <form role="form" class="form-horizontal" method="post" action="/list/add">
 [% FOREACH field IN fields -%]
     <div class="form-group">
       <label class="col-md-2 control-label" for="[% field.name %]">[% field.label %]</label>

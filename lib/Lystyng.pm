@@ -9,6 +9,7 @@ package Lystyng;
 use Dancer2;
 our $VERSION = '0.0.1';
 use Dancer2::Plugin::DBIC qw[schema resultset];
+use Dancer2::Plugin::Auth::Tiny;
 use Lystyng::Schema;
 
 Lystyng::Schema->check_env();
@@ -46,13 +47,13 @@ get '/user/:username' => sub {
   }
 };
 
-get '/user/:username/list/add' => sub {
+get '/list/add' => needs login => sub {
   redirect '/login' unless session('user');
 
   template 'addlist';
 };
 
-post '/user/:username/list/add' => sub {
+post '/list/add' => needs login => sub {
   redirect '/login' unless session('user');
 
   session('user')->add_to_lists({
