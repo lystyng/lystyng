@@ -18,18 +18,6 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
-=head1 COMPONENTS LOADED
-
-=over 4
-
-=item * L<DBIx::Class::EncodedColumn>
-
-=back
-
-=cut
-
-__PACKAGE__->load_components("EncodedColumn");
-
 =head1 TABLE: C<list>
 
 =cut
@@ -127,8 +115,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-01-30 20:13:57
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:3eYA3YhJdL90HQRfNN07EA
+# Created by DBIx::Class::Schema::Loader v0.07043 @ 2016-01-15 12:36:39
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Muyi0l0fFobj6kkf1bRP6g
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

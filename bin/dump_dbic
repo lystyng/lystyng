@@ -10,7 +10,9 @@ make_schema_at(
   'Lystyng::Schema', {
     dump_directory => 'lib',
     use_moose => 1,
-    components => [ 'EncodedColumn' ],
+    result_components_map => {
+      User => [ 'EncodedColumn' ],
+    },
     custom_column_info => \&encode_password,
   }, [
     "dbi:mysql:dbname=$ENV{LYSTYNG_DB_NAME};host=$ENV{LYSTYNG_DB_SERVER}",
@@ -20,6 +22,8 @@ make_schema_at(
 
 sub encode_password {
   my ($table, $column_name) = @_;
+
+  return unless $table eq 'user';
 
   if ($column_name eq 'password') {
     return {
