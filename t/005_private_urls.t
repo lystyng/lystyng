@@ -15,6 +15,7 @@ my $jar = HTTP::Cookies->new;
 my $app = Lystyng->to_app;
 my $test = Plack::Test->create($app);
 
+my $url = 'http://localhost';
 my %routes = (
   'list/add' => {
     out => {
@@ -40,23 +41,20 @@ my $user = $sch->resultset('User')->create({
   password => 'TEST',
 });
 
-my $res = $test->request(POST '/login', [
+my $res = $test->request(POST "$url/login", [
   username => $user->username,
   password => 'TEST',
 ]);
 
 $jar->extract_cookies($res);
 
-TODO: {
-  local $TODO = "Haven't got the cookie handling working yet";
-  test_routes(\%routes, 'in');
-}
+test_routes(\%routes, 'in');
 
 sub test_routes {
   my ($routes, $state) = @_;
 
   for (keys %$routes) {
-    my $req = GET "/$_";
+    my $req = GET "$url/$_";
     $jar->add_cookie_header($req);
     my $res = $test->request( $req );
     is $res->code, $routes->{$_}{$state}{code},
