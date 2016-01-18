@@ -12,6 +12,7 @@ my $build = Module::Build->new(
         Template    => 0,
         Plack::Test => 0,
         Dancer2::Plugin::DBIC      => 0,
+        Dancer2::Plugin::Auth::Tiny => 0,
         MooseX::MarkAsMethods      => 0,
         MooseX::NonMoose           => 0,
         DBIx::Class::EncodedColumn => 0,
