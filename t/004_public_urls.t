@@ -39,7 +39,8 @@ my %route = (
 for (keys %route) {
   my $res = $test->request( GET "/$_" );
   is $res->code, $route{$_},
-    "response status is $route{$_} for /$_";
+    "response status is $route{$_} for /$_" or
+    diag $res->content;
 }
 
 my $user = $sch->resultset('User')->create( $test_user_data );
