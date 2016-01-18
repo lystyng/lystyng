@@ -150,4 +150,4 @@ get '/logout' => sub {
   redirect '/';
 };
 
-true;
+1;

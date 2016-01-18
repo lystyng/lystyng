@@ -17,6 +17,8 @@ __PACKAGE__->load_namespaces;
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 
+use Carp;
+
 sub check_env {
   my @errors;
   foreach (qw[LYSTYNG_DB_SERVER LYSTYNG_DB_NAME
@@ -25,7 +27,7 @@ sub check_env {
   }
 
   if (@errors) {
-    die("Missing connection info: @errors");
+    croak("Missing connection info: @errors");
   }
 }
 
