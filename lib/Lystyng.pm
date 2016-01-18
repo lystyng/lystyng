@@ -34,17 +34,17 @@ get '/user' => sub {
 };
 
 get '/user/:username' => sub {
-  if (my $user = resultset('User')->find({
+  my $user = resultset('User')->find({
     username => params->{username},
   }, {
     prefetch => 'lists'
-  })) {
-    template 'user', {
-      user => $user,
-    };
-  } else {
-    send_error 'User not found', 404;
-  }
+  });
+
+  send_error 'User not found', 404 unless $user;
+
+  template 'user', {
+    user => $user,
+  };
 };
 
 get '/list/add' => needs login => sub {
@@ -52,31 +52,32 @@ get '/list/add' => needs login => sub {
 };
 
 post '/list/add' => needs login => sub {
-  session('user')->add_to_lists({
-    title       => params->{list_title},
-    slug        => params->{list_slug},
-    description => params->{list_description},
-  });
+  my $user = session('user');
+  my $list_data;
+  $list_data->{$_} = params->{"list_$_"}
+    for (qw[title slug description]);
 
-  redirect '/user/' . session('user')->username;
+  $user->add_to_lists($list_data);
+
+  redirect '/user/' . $user->username .
+           '/list/' . $list_data->{slug};
 };
 
 get '/user/:username/list/:list' => sub {
-  my $user;
-  unless ($user = resultset('User')->find({
+  my $user = resultset('User')->find({
     username => params->{username},
-  })) {
-    send_error 'User not found', 404;
-  };
+  });
 
-  if (my $list = $user->lists->find({
+  send_error 'User not found', 404 unless $user;
+
+  my $list = $user->lists->find({
     slug => params->{list},
-  })) {
-    template 'list', {
-      list => $list,
-    };
-  } else {
-    send_error 'List not found', 404;
+  });
+
+  send_error 'List not found', 404 unless $list;
+
+  template 'list', {
+    list => $list,
   };
 };
 
@@ -107,21 +108,21 @@ post '/register' => sub {
   };
 
   if (@errors) {
-    template 'register', {
+    return template 'register', {
       errors => \@errors,
     };
-  } else {
-    $user = $user_rs->create({
-      username => param('username'),
-      name     => param('name'),
-      email    => param('email'),
-      password => param('password'),
-    });
-
-    session user => $user;
-
-    redirect '/user/' . $user->username;
   }
+
+  $user = $user_rs->create({
+    username => param('username'),
+    name     => param('name'),
+    email    => param('email'),
+    password => param('password'),
+  });
+
+  session user => $user;
+
+  redirect '/user/' . $user->username;
 };
 
 get '/login' => sub {
