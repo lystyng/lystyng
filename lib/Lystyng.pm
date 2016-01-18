@@ -86,10 +86,14 @@ get '/register' => sub {
 };
 
 post '/register' => sub {
-  my @errors;
+  my ($user_data, @errors);
 
   foreach (qw[username name email password password2]) {
-    push @errors, qq[Field "$_" is missing] unless defined param($_);
+    if (defined param($_)) {
+      $user_data->{$_} = param($_);
+    } else {
+      push @errors, qq[Field "$_" is missing];
+    }
   }
 
   if (@errors) {
@@ -98,13 +102,13 @@ post '/register' => sub {
     };
   }
 
-  if (param('password') ne param('password2')) {
+  if ($user_data->{password} ne $user_data->{password2}) {
     push @errors, 'Your passwords do not match.';
   }
   my $user_rs = resultset('User');
-  my ($user) = $user_rs->find({ username => param('username') });
+  my ($user) = $user_rs->find({ username => $user_data->{username} });
   if ($user) {
-    push @errors, 'Username ' . $user->username . ' is already in use.';
+    push @errors, "Username '$user_data->{username}' is already in use.";
   };
 
   if (@errors) {
@@ -113,12 +117,8 @@ post '/register' => sub {
     };
   }
 
-  $user = $user_rs->create({
-    username => param('username'),
-    name     => param('name'),
-    email    => param('email'),
-    password => param('password'),
-  });
+  delete $user_data->{password2};
+  $user = $user_rs->create( $user_data );
 
   session user => $user;
 
