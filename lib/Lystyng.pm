@@ -48,14 +48,10 @@ get '/user/:username' => sub {
 };
 
 get '/list/add' => needs login => sub {
-  redirect '/login' unless session('user');
-
   template 'addlist';
 };
 
 post '/list/add' => needs login => sub {
-  redirect '/login' unless session('user');
-
   session('user')->add_to_lists({
     title       => params->{list_title},
     slug        => params->{list_slug},
