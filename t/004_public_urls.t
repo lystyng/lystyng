@@ -10,6 +10,22 @@ use Lystyng;
 
 use Lystyng::Schema;
 
+my $sch = eval { Lystyng::Schema->get_schema };
+BAIL_OUT("Can't connect to database: $@") if $@;
+
+my $test_user_data = {
+  username => 'test',
+  name     => 'Test User',
+  email    => 'test@example.com',
+  password => 'TEST',
+};
+
+# Ensure the 'test' user doesn't exist
+my $test_user = $sch->resultset('User')->find({
+  username => $test_user_data->{username},
+});
+$test_user->delete if $test_user;
+
 my $app = Lystyng->to_app;
 my $test = Plack::Test->create($app);
 
@@ -26,15 +42,7 @@ for (keys %route) {
     "response status is $route{$_} for /$_";
 }
 
-my $sch = eval { Lystyng::Schema->get_schema };
-BAIL_OUT("Can't connect to database: $@") if $@;
-
-my $user = $sch->resultset('User')->create({
-  username => 'test',
-  name     => 'Test User',
-  email    => 'test@example.com',
-  password => 'TEST',
-});
+my $user = $sch->resultset('User')->create( $test_user_data );
 
 my $res = $test->request(GET '/user/test');
 is $res->code, 200, 'response status is 200 for /user/test';

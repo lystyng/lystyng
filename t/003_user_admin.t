@@ -15,6 +15,19 @@ my $test = Plack::Test->create($app);
 my $sch = eval { Lystyng::Schema->get_schema };
 BAIL_OUT($@) if $@;
 
+my $test_user_data = {
+  username  => 'test',
+  name      => 'Test User',
+  email     => 'test@example.com',
+  password  => 'TEST',
+};
+
+# Ensure test user doesn't exist
+my $test_user = $sch->resultset('User')->find({
+  username => $test_user_data->{username},
+});
+$test_user->delete if $test_user;
+
 my %route = (
   register => 200,
   login    => 200,
@@ -26,34 +39,30 @@ for (keys %route) {
   is( $res->code, $route{$_}, "response status is $route{$_} for /$_" );
 }
 
-
-my $user_hash = {
-  username  => 'test',
-  name      => 'Test User',
-  email     => 'test@example.com',
-  password  => 'TEST',
-};
-
-my $res = $test->request(POST '/register', [ %$user_hash ]);
+my $res = $test->request(POST '/register', [ %$test_user_data ]);
 
 ok $res, 'Got a response from /register';
 is $res->code, 200, 'Response is 200';
 like $res->content, qr[is missing], 'Password2 is missing';
 
-$user_hash->{password2} = 'Something else';
+$test_user_data->{password2} = 'Something else';
 
-$res = $test->request(POST '/register', [ %$user_hash ]);
+$res = $test->request(POST '/register', [ %$test_user_data ]);
 
 ok $res, 'Got a response from /register';
 is $res->code, 200, 'Response is 200';
 like $res->content, qr[do not match], 'Passwords do not match';
 
-$user_hash->{password2} = 'TEST';
-$res = $test->request(POST '/register', [ %$user_hash ]);
+$test_user_data->{password2} = 'TEST';
+$res = $test->request(POST '/register', [ %$test_user_data ]);
 
 ok $res, 'Got a response from /register';
 is $res->code, 302, 'Response is 302';
 
-$sch->resultset('User')->delete;
+# Clean up after ourselves
+$test = $sch->resultset('User')->find({
+  username => $test_user_data->{username},
+});
+$test->delete;
 
 done_testing;

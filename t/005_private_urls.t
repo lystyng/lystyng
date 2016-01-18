@@ -8,8 +8,23 @@ use HTTP::Cookies;
 use lib 'lib';
 
 use Lystyng;
-
 use Lystyng::Schema;
+
+my $sch = eval { Lystyng::Schema->get_schema };
+BAIL_OUT("Can't connect to database: $@") if $@;
+
+my $test_user_data = {
+  username => 'test',
+  name     => 'Test User',
+  email    => 'test@example.com',
+  password => 'TEST',
+};
+
+# Ensure the test user doesn't already exist
+my $test_user = $sch->resultset('User')->find({
+  username => $test_user_data->{username},
+});
+$test_user->delete if $test_user;
 
 my $jar = HTTP::Cookies->new;
 my $app = Lystyng->to_app;
@@ -31,19 +46,11 @@ my %routes = (
 
 test_routes(\%routes, 'out');
 
-my $sch = eval { Lystyng::Schema->get_schema };
-BAIL_OUT("Can't connect to database: $@") if $@;
-
-my $user = $sch->resultset('User')->create({
-  username => 'test',
-  name     => 'Test User',
-  email    => 'test@example.com',
-  password => 'TEST',
-});
+my $user = $sch->resultset('User')->create( $test_user_data );
 
 my $res = $test->request(POST "$url/login", [
-  username => $user->username,
-  password => 'TEST',
+  username => $test_user_data->{username},
+  password => $test_user_data->{password},
 ]);
 
 $jar->extract_cookies($res);
