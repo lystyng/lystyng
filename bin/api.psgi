@@ -27,11 +27,12 @@ use FindBin '$Bin';
 use lib "$Bin/../lib";
 use Lystyng::Schema;
 
+$ENV{WEBAPI_DBIC_HTTP_AUTH_TYPE} //= 'none';
+$ENV{WEBAPI_DBIC_WRITABLE}       //= 0;
+
 my $hal_app = Plack::App::File->new(
   root => Alien::Web::HalBrowser->dir
 )->to_app;
-
-$ENV{WEBAPI_DBIC_HTTP_AUTH_TYPE} //= 'none';
 
 my $schema = Lystyng::Schema->get_schema;
 
@@ -39,7 +40,7 @@ my $app = WebAPI::DBIC::WebApp->new({
     routes => [ map( $schema->source($_), $schema->sources) ]
 })->to_psgi_app;
 
-my $app_prefix = "/webapi-dbic";
+my $app_prefix = "/api";
 
 builder {
     enable "SimpleLogger";  # show on STDERR
