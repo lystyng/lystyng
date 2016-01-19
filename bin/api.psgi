@@ -40,16 +40,9 @@ my $app = WebAPI::DBIC::WebApp->new({
     routes => [ map( $schema->source($_), $schema->sources) ]
 })->to_psgi_app;
 
-my $app_prefix = "/api";
-
 builder {
     enable "SimpleLogger";  # show on STDERR
 
-    mount "$app_prefix/" => builder {
-        mount "/browser" => $hal_app;
-        mount "/" => $app;
-    };
-
-    # root redirect for discovery - redirect to API
-    mount "/" => sub { [ 302, [ Location => "$app_prefix/" ], [ ] ] };
+    mount "/browser" => $hal_app;
+    mount "/" => $app;
 };
