@@ -35,7 +35,7 @@ get '/user' => sub {
 
 get '/user/:username' => sub {
   my $user = resultset('User')->find({
-    username => params->{username},
+    username => route_parameters->get('username'),
   }, {
     prefetch => 'lists'
   });
@@ -54,7 +54,7 @@ get '/list/add' => needs login => sub {
 post '/list/add' => needs login => sub {
   my $user = session('user');
   my $list_data;
-  $list_data->{$_} = params->{"list_$_"}
+  $list_data->{$_} = body_parameters->get("list_$_")
     for (qw[title slug description]);
 
   $user->add_to_lists($list_data);
@@ -65,13 +65,13 @@ post '/list/add' => needs login => sub {
 
 get '/user/:username/list/:list' => sub {
   my $user = resultset('User')->find({
-    username => params->{username},
+    username => route_parameters->get('username'),
   });
 
   send_error 'User not found', 404 unless $user;
 
   my $list = $user->lists->find({
-    slug => params->{list},
+    slug => route_parameterss->get('list'),
   });
 
   send_error 'List not found', 404 unless $list;
@@ -89,8 +89,8 @@ post '/register' => sub {
   my ($user_data, @errors);
 
   foreach (qw[username name email password password2]) {
-    if (defined param($_)) {
-      $user_data->{$_} = param($_);
+    if (defined (my $val = body_parameters->get($_))) {
+      $user_data->{$_} = $val;
     } else {
       push @errors, qq[Field "$_" is missing];
     }
@@ -131,8 +131,8 @@ get '/login' => sub {
 
 post '/login' => sub {
   my $user_rs = resultset('User');
-  my ($user) = $user_rs->find({ username => param('username') });
-  if ($user && $user->check_password(param('password'))) {
+  my ($user) = $user_rs->find({ username => body_parameters->get('username') });
+  if ($user && $user->check_password(body_parameters->get('password'))) {
     session user => $user;
     redirect '/user/' . $user->username;
   } else {
