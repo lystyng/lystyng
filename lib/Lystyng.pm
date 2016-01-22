@@ -26,58 +26,62 @@ get '/' => sub {
   template 'index';
 };
 
-get '/user' => sub {
-  my @users = resultset('User')->all;
-  template 'users', {
-    users => \@users,
+prefix '/user' => sub {
+  get '' => sub {
+    my @users = resultset('User')->all;
+    template 'users', {
+      users => \@users,
+    };
+  };
+
+  get '/:username' => sub {
+    my $user = resultset('User')->find({
+      username => route_parameters->get('username'),
+    }, {
+      prefetch => 'lists'
+    });
+
+    send_error 'User not found', 404 unless $user;
+
+    template 'user', {
+      user => $user,
+    };
+  };
+
+  get '/:username/list/:list' => sub {
+    my $user = resultset('User')->find({
+      username => route_parameters->get('username'),
+    });
+
+    send_error 'User not found', 404 unless $user;
+
+    my $list = $user->lists->find({
+      slug => route_parameterss->get('list'),
+    });
+
+    send_error 'List not found', 404 unless $list;
+
+    template 'list', {
+      list => $list,
+    };
   };
 };
 
-get '/user/:username' => sub {
-  my $user = resultset('User')->find({
-    username => route_parameters->get('username'),
-  }, {
-    prefetch => 'lists'
-  });
-
-  send_error 'User not found', 404 unless $user;
-
-  template 'user', {
-    user => $user,
+prefix '/list' => sub {
+  get '/add' => needs login => sub {
+    template 'addlist';
   };
-};
 
-get '/list/add' => needs login => sub {
-  template 'addlist';
-};
+  post '/add' => needs login => sub {
+    my $user = session('user');
+    my $list_data;
+    $list_data->{$_} = body_parameters->get("list_$_")
+      for (qw[title slug description]);
 
-post '/list/add' => needs login => sub {
-  my $user = session('user');
-  my $list_data;
-  $list_data->{$_} = body_parameters->get("list_$_")
-    for (qw[title slug description]);
+    $user->add_to_lists($list_data);
 
-  $user->add_to_lists($list_data);
-
-  redirect '/user/' . $user->username .
-           '/list/' . $list_data->{slug};
-};
-
-get '/user/:username/list/:list' => sub {
-  my $user = resultset('User')->find({
-    username => route_parameters->get('username'),
-  });
-
-  send_error 'User not found', 404 unless $user;
-
-  my $list = $user->lists->find({
-    slug => route_parameterss->get('list'),
-  });
-
-  send_error 'List not found', 404 unless $list;
-
-  template 'list', {
-    list => $list,
+    redirect '/user/' . $user->username .
+             '/list/' . $list_data->{slug};
   };
 };
 
