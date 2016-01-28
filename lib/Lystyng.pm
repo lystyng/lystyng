@@ -80,8 +80,8 @@ prefix '/list' => sub {
 
     $user->add_to_lists($list_data);
 
-    redirect '/user/' . $user->username .
-             '/list/' . $list_data->{slug};
+    redirect uri_for('/user/' . $user->username .
+                     '/list/' . $list_data->{slug});
   };
 };
 
@@ -126,7 +126,7 @@ post '/register' => sub {
 
   session user => $user;
 
-  redirect '/user/' . $user->username;
+  redirect uri_for('/user/' . $user->username);
 };
 
 get '/login' => sub {
@@ -138,7 +138,7 @@ post '/login' => sub {
   my ($user) = $user_rs->find({ username => body_parameters->get('username') });
   if ($user && $user->check_password(body_parameters->get('password'))) {
     session user => $user;
-    redirect '/user/' . $user->username;
+    redirect uri_for('/user/' . $user->username);
   } else {
     template 'login', {
       error    => 1,
@@ -148,7 +148,7 @@ post '/login' => sub {
 
 get '/logout' => sub {
   session user => undef;
-  redirect '/';
+  redirect uri_for('/');
 };
 
 1;
