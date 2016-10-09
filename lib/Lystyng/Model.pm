@@ -30,7 +30,7 @@ sub get_all_users {
 
 sub get_user_by_username {
   my $self = shift;
-  my $username = (@_);
+  my ($username) = @_;
 
   return $self->user_rs->find({
     username => $username,
