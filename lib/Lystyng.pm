@@ -56,7 +56,7 @@ prefix '/user' => sub {
     send_error 'User not found', 404 unless $user;
 
     my $list = $user->lists->find({
-      slug => route_parameterss->get('list'),
+      slug => route_parameters->get('list'),
     });
 
     send_error 'List not found', 404 unless $list;
