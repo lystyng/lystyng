@@ -8,7 +8,7 @@ package Lystyng;
 
 use Dancer2;
 our $VERSION = '0.0.1';
-use Dancer2::Plugin::DBIC qw[schema resultset];
+use Dancer2::Plugin::DBIC;
 use Dancer2::Plugin::Auth::Tiny;
 use Lystyng::Schema;
 
