@@ -8,19 +8,10 @@ package Lystyng;
 
 use Dancer2;
 our $VERSION = '0.0.1';
-use Dancer2::Plugin::DBIC;
 use Dancer2::Plugin::Auth::Tiny;
-use Lystyng::Schema;
+use Lystyng::Model;
 
-Lystyng::Schema->check_env();
-
-hook before => sub {
-  my $cfg = dancer_app->config;
-  $cfg->{plugins}{DBIC}{default}{user}     = $ENV{LYSTYNG_DB_USER};
-  $cfg->{plugins}{DBIC}{default}{password} = $ENV{LYSTYNG_DB_PASS};
-  $cfg->{plugins}{DBIC}{default}{dsn}      =
-    "dbi:mysql:dbname=$ENV{LYSTYNG_DB_NAME};hostname=$ENV{LYSTYNG_DB_SERVER}";
-};
+my $model = Lystyng::Model->new;
 
 get '/' => sub {
   template 'index';
@@ -28,18 +19,15 @@ get '/' => sub {
 
 prefix '/user' => sub {
   get '' => sub {
-    my @users = resultset('User')->all;
     template 'users', {
-      users => \@users,
+      users => [ $model->get_all_users ],
     };
   };
 
   get '/:username' => sub {
-    my $user = resultset('User')->find({
-      username => route_parameters->get('username'),
-    }, {
-      prefetch => 'lists'
-    });
+    my $user = $model->get_user_by_username(
+      route_parameters->get('username')
+    );
 
     send_error 'User not found', 404 unless $user;
 
@@ -49,15 +37,15 @@ prefix '/user' => sub {
   };
 
   get '/:username/list/:list' => sub {
-    my $user = resultset('User')->find({
-      username => route_parameters->get('username'),
-    });
+    my $user = $model->get_user_by_username(
+      route_parameters->get('username'),
+    );
 
     send_error 'User not found', 404 unless $user;
 
-    my $list = $user->lists->find({
-      slug => route_parameters->get('list'),
-    });
+    my $list = $model->get_user_list_by_slug(
+      $user, route_parameters->get('slug'),
+    );
 
     send_error 'List not found', 404 unless $list;
 
@@ -78,7 +66,7 @@ prefix '/list' => sub {
     $list_data->{$_} = body_parameters->get("list_$_")
       for (qw[title slug description]);
 
-    $user->add_to_lists($list_data);
+    $model->add_user_list($user, $list_data);
 
     redirect uri_for('/user/' . $user->username .
                      '/list/' . $list_data->{slug});
@@ -109,8 +97,8 @@ post '/register' => sub {
   if ($user_data->{password} ne $user_data->{password2}) {
     push @errors, 'Your passwords do not match.';
   }
-  my $user_rs = resultset('User');
-  my ($user) = $user_rs->find({ username => $user_data->{username} });
+
+  my ($user) = $model->get_user_by_username($user_data->{username});
   if ($user) {
     push @errors, "Username '$user_data->{username}' is already in use.";
   };
@@ -122,7 +110,7 @@ post '/register' => sub {
   }
 
   delete $user_data->{password2};
-  $user = $user_rs->create( $user_data );
+  $user = $model->add_user( $user_data );
 
   session user => $user;
 
@@ -135,7 +123,7 @@ get '/login' => sub {
 
 post '/login' => sub {
   my $user_rs = resultset('User');
-  my ($user) = $user_rs->find({ username => body_parameters->get('username') });
+  my ($user) = $model->get_user_by_username(body_parameters->get('username'));
   if ($user && $user->check_password(body_parameters->get('password'))) {
     session user => $user;
     redirect uri_for('/user/' . $user->username);
