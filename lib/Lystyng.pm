@@ -11,7 +11,7 @@ our $VERSION = '0.0.1';
 use Dancer2::Plugin::Auth::Tiny;
 use Lystyng::Model;
 
-my $model->Lystyng::Model->new;
+my $model = Lystyng::Model->new;
 
 get '/' => sub {
   template 'index';
