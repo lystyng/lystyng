@@ -10,6 +10,20 @@ use lib 'lib';
 use Lystyng;
 use Lystyng::Schema;
 
+sub test_routes {
+  my ($routes, $state, $test, $jar, $url) = @_;
+
+  for (keys %$routes) {
+    my $req = GET "$url/$_";
+    $jar->add_cookie_header($req);
+    my $res = $test->request( $req );
+    is $res->code, $routes->{$_}{$state}{code},
+      "response status is $routes->{$_}{$state}{code} for /$_";
+    like $res->content, qr/$routes->{$_}{$state}{content}/,
+      "content for /$_ looks correct";
+  }
+}
+
 my $sch = eval { Lystyng::Schema->get_schema };
 BAIL_OUT("Can't connect to database: $@") if $@;
 
@@ -30,7 +44,6 @@ my $jar = HTTP::Cookies->new;
 my $app = Lystyng->to_app;
 my $test = Plack::Test->create($app);
 
-my $url = 'http://localhost';
 my %routes = (
   'list/add' => {
     out => {
@@ -44,32 +57,26 @@ my %routes = (
   },
 );
 
-test_routes(\%routes, 'out');
+my $base_url = 'http://localhost';
+
+diag('Testing logged out');
+test_routes(\%routes, 'out', $test, $jar, $base_url);
 
 my $user = $sch->resultset('User')->create( $test_user_data );
 
-my $res = $test->request(POST "$url/login", [
+BAIL_OUT('User not created, no point in continuing') unless $user;
+
+my $res = $test->request(POST "$base_url/login", [
   username => $test_user_data->{username},
   password => $test_user_data->{password},
 ]);
 
+diag('Login response code: ', $res->code);
+
 $jar->extract_cookies($res);
 
-test_routes(\%routes, 'in');
-
-sub test_routes {
-  my ($routes, $state) = @_;
-
-  for (keys %$routes) {
-    my $req = GET "$url/$_";
-    $jar->add_cookie_header($req);
-    my $res = $test->request( $req );
-    is $res->code, $routes->{$_}{$state}{code},
-      "response status is $routes->{$_}{$state}{code} for /$_";
-    like $res->content, qr/$routes->{$_}{$state}{content}/,
-      "content for /$_ looks correct";
-  }
-}
+diag('Testing logged in');
+test_routes(\%routes, 'in', $test, $jar, $base_url);
 
 $user->delete;
 
