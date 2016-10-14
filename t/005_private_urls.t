@@ -10,6 +10,20 @@ use lib 'lib';
 use Lystyng;
 use Lystyng::Schema;
 
+sub test_routes {
+  my ($routes, $state) = @_;
+
+  for (keys %$routes) {
+    my $req = GET "$url/$_";
+    $jar->add_cookie_header($req);
+    my $res = $test->request( $req );
+    is $res->code, $routes->{$_}{$state}{code},
+      "response status is $routes->{$_}{$state}{code} for /$_";
+    like $res->content, qr/$routes->{$_}{$state}{content}/,
+      "content for /$_ looks correct";
+  }
+}
+
 my $sch = eval { Lystyng::Schema->get_schema };
 BAIL_OUT("Can't connect to database: $@") if $@;
 
@@ -49,7 +63,7 @@ test_routes(\%routes, 'out');
 
 my $user = $sch->resultset('User')->create( $test_user_data );
 
-BAIL_OUT('User note created, not point in continuing') unless $user;
+BAIL_OUT('User not created, no point in continuing') unless $user;
 
 my $res = $test->request(POST "$url/login", [
   username => $test_user_data->{username},
@@ -62,20 +76,6 @@ $jar->extract_cookies($res);
 
 diag('Testing logged in');
 test_routes(\%routes, 'in');
-
-sub test_routes {
-  my ($routes, $state) = @_;
-
-  for (keys %$routes) {
-    my $req = GET "$url/$_";
-    $jar->add_cookie_header($req);
-    my $res = $test->request( $req );
-    is $res->code, $routes->{$_}{$state}{code},
-      "response status is $routes->{$_}{$state}{code} for /$_";
-    like $res->content, qr/$routes->{$_}{$state}{content}/,
-      "content for /$_ looks correct";
-  }
-}
 
 $user->delete;
 
