@@ -122,7 +122,6 @@ get '/login' => sub {
 };
 
 post '/login' => sub {
-  my $user_rs = resultset('User');
   my ($user) = $model->get_user_by_username(body_parameters->get('username'));
   if ($user && $user->check_password(body_parameters->get('password'))) {
     session user => $user;
