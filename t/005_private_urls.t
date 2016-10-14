@@ -11,7 +11,7 @@ use Lystyng;
 use Lystyng::Schema;
 
 sub test_routes {
-  my ($routes, $state) = @_;
+  my ($routes, $state, $test, $jar) = @_;
 
   for (keys %$routes) {
     my $req = GET "$url/$_";
@@ -59,7 +59,7 @@ my %routes = (
 );
 
 diag('Testing logged out');
-test_routes(\%routes, 'out');
+test_routes(\%routes, 'out', $test, $jar);
 
 my $user = $sch->resultset('User')->create( $test_user_data );
 
@@ -75,7 +75,7 @@ diag('Login response code: ', $res->code);
 $jar->extract_cookies($res);
 
 diag('Testing logged in');
-test_routes(\%routes, 'in');
+test_routes(\%routes, 'in', $test, $jar);
 
 $user->delete;
 
