@@ -44,17 +44,23 @@ my %routes = (
   },
 );
 
+diag('Testing logged out');
 test_routes(\%routes, 'out');
 
 my $user = $sch->resultset('User')->create( $test_user_data );
+
+BAIL_OUT('User note created, not point in continuing') unless $user;
 
 my $res = $test->request(POST "$url/login", [
   username => $test_user_data->{username},
   password => $test_user_data->{password},
 ]);
 
+diag('Login response code: ', $res->code);
+
 $jar->extract_cookies($res);
 
+diag('Testing logged in');
 test_routes(\%routes, 'in');
 
 sub test_routes {
