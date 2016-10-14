@@ -12,6 +12,7 @@ use Lystyng::Schema;
 
 sub test_routes {
   my ($routes, $state, $test, $jar) = @_;
+  my $url = 'http://localhost';
 
   for (keys %$routes) {
     my $req = GET "$url/$_";
@@ -44,7 +45,6 @@ my $jar = HTTP::Cookies->new;
 my $app = Lystyng->to_app;
 my $test = Plack::Test->create($app);
 
-my $url = 'http://localhost';
 my %routes = (
   'list/add' => {
     out => {
