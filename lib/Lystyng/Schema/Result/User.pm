@@ -72,6 +72,12 @@ __PACKAGE__->table("user");
   is_nullable: 0
   size: 64
 
+=head2 verify
+
+  data_type: 'char'
+  is_nullable: 1
+  size: 32
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -93,6 +99,8 @@ __PACKAGE__->add_columns(
     is_nullable         => 0,
     size                => 64,
   },
+  "verify",
+  { data_type => "char", is_nullable => 1, size => 32 },
 );
 
 =head1 PRIMARY KEY
@@ -180,5 +188,34 @@ __PACKAGE__->many_to_many("user2s", "friendship_user1s", "user2");
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
+
+use Email::Stuffer;
+
+sub send_verify {
+  my $self = shift;
+  my ($url) = @_;
+
+  my $name   = $self->name;
+  my $verify = $self->verify;
+
+  my $body = <<EO_EMAIL;
+
+Dear $name,
+
+Thank you for registering for Lystyng.
+
+Please click on the link below to verify your email address.
+
+  $url/$verify
+
+EO_EMAIL
+
+  Email::Stuffer->from('admin@lystyng.com')
+                ->to($self->email)
+                ->subject('Lystyng: Verify Your Email Address')
+                ->text_body($body)
+                ->send;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;

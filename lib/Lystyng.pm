@@ -9,6 +9,7 @@ package Lystyng;
 use Dancer2;
 our $VERSION = '0.0.1';
 use Dancer2::Plugin::Auth::Tiny;
+use Dancer2::Plugin::Passphrase;
 use Lystyng::Model;
 
 my $model = Lystyng::Model->new;
@@ -103,6 +104,11 @@ post '/register' => sub {
     push @errors, "Username '$user_data->{username}' is already in use.";
   };
 
+  ($user) = $model->get_user_by_email($user_data->{email});
+  if ($user) {
+    push @errors, "Email address '$user_data->{email}' is already registered.";
+  }
+
   if (@errors) {
     return template 'register', {
       errors => \@errors,
@@ -110,9 +116,31 @@ post '/register' => sub {
   }
 
   delete $user_data->{password2};
+  $user_data->{verify} = passphrase->generate_random({
+    length  => 32,
+    charset => [ 'a' .. 'z', 'A' .. 'Z', 0 .. 9],
+  });
+
   $user = $model->add_user( $user_data );
 
+  $user->send_verify(uri_for('/verify'));
+
   session user => $user;
+
+  redirect uri_for('/user/' . $user->username);
+};
+
+get '/verify/:code' => sub {
+  my $code = route_parameters->get('code');
+  my $user = $model->get_user_by_attribute(
+    verify => $code,
+  );
+
+  unless ($user) {
+    return 'That verification code is invalid';
+  }
+
+  $user->update({ verify => undef });
 
   redirect uri_for('/user/' . $user->username);
 };

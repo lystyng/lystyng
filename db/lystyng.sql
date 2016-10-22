@@ -4,7 +4,8 @@ create table `user` (
   username varchar(20) not null,
   name varchar(100) not null,
   email varchar(200) not null,
-  password char(64) not null
+  password char(64) not null,
+  verify char(32) null
 ) ENGINE=INNODB CHARSET=utf8;
 
 drop table if exists `friendship`;

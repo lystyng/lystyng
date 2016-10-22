@@ -28,21 +28,37 @@ sub get_all_users {
   return $self->user_rs->all;
 }
 
+sub get_user_by_attribute {
+  my $self = shift;
+  my ($attribute, $value) = @_;
+
+  return $self->user_rs->find({
+    $attribute => $value,
+  });
+}
+
 sub get_user_by_username {
   my $self = shift;
   my ($username) = @_;
 
-  return $self->user_rs->find({
+  return $self->get_user_by_attribute(
     username => $username,
-  }, {
-    prefetch => 'lists',
-  });
+  );
+}
+
+sub get_user_by_email {
+  my $self = shift;
+  my ($email) = @_;
+
+  return $self->get_user_by_attribute(
+    email => $email,
+  )
 }
 
 sub get_user_list_by_slug {
   my $self = shift;
   my ($user, $slug) = @_;
-  
+
   return $user->lists->find({
     slug => $slug,
   });
@@ -51,14 +67,14 @@ sub get_user_list_by_slug {
 sub add_user_list {
   my $self = shift;
   my ($user, $list_data) = @_;
-  
+
   $user->add_to_lists($list_data);
 }
 
 sub add_user {
   my $self = shift;
   my ($user_data) = @_;
-  
+
   $self->user_rs->create($user_data);
 }
 
