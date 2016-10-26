@@ -20,7 +20,7 @@ create table list (
 drop table if exists `tag`;
 create table tag (
   id integer primary key auto_increment,
-  name varchar(200) not null,
+  name varchar(200) not null
 ) ENGINE=INNODB CHARSET=utf8;
 
 drop table if exists `list_tag`;
