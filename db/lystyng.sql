@@ -17,13 +17,13 @@ create table list (
   foreign key (user) references `user`(id)
 ) ENGINE=INNODB CHARSET=utf8;
 
-drop table if exists 'tag';
-create table tag(
+drop table if exists `tag`;
+create table tag (
   id integer primary key auto_increment,
   name varchar(200) not null,
 ) ENGINE=INNODB CHARSET=utf8;
 
-drop table if exists 'list_tag';
+drop table if exists `list_tag`;
 create table list_tag (
   id integer primary key auto_increment,
   list integer not null,
