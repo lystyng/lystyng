@@ -25,5 +25,5 @@ script:
   - cover
 
 after_success:
-  - cover -report coveralls
+  - cover +ignore ^t/ +ignore ^/home/travis -report coveralls
 
