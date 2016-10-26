@@ -28,7 +28,7 @@ create table list_tag (
   id integer primary key auto_increment,
   list integer not null,
   tag integer not null,
-  foreign key (list) references list(id)
+  foreign key (list) references list(id),
   foreign key (tag) references tag(id)
 ) ENGINE=INNODB CHARSET=utf8;
 
