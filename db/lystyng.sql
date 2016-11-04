@@ -7,7 +7,7 @@ create table `user` (
   password char(64) not null
 ) ENGINE=INNODB CHARSET=utf8;
 
-drop table if exists 'friendship';
+drop table if exists `friendship`;
 create table `friendship` (
   user1 integer not null,
   user2 integer not null,
