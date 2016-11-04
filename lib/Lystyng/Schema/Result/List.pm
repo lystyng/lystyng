@@ -49,6 +49,17 @@ __PACKAGE__->table("list");
   data_type: 'text'
   is_nullable: 1
 
+=head2 is_todo
+
+  data_type: 'tinyint'
+  is_nullable: 1
+
+=head2 privacy
+
+  data_type: 'enum'
+  extra: {list => ["private","friends","public"]}
+  is_nullable: 1
+
 =head2 user
 
   data_type: 'integer'
@@ -66,6 +77,14 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 0, size => 200 },
   "description",
   { data_type => "text", is_nullable => 1 },
+  "is_todo",
+  { data_type => "tinyint", is_nullable => 1 },
+  "privacy",
+  {
+    data_type => "enum",
+    extra => { list => ["private", "friends", "public"] },
+    is_nullable => 1,
+  },
   "user",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
 );
@@ -99,6 +118,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 list_tags
+
+Type: has_many
+
+Related object: L<Lystyng::Schema::Result::ListTag>
+
+=cut
+
+__PACKAGE__->has_many(
+  "list_tags",
+  "Lystyng::Schema::Result::ListTag",
+  { "foreign.list" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 user
 
 Type: belongs_to
@@ -115,8 +149,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2016-01-15 12:36:39
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Muyi0l0fFobj6kkf1bRP6g
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-11-04 20:34:09
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BqUC3QeqIhe2vGqnbQukVw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

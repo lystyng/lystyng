@@ -109,6 +109,36 @@ __PACKAGE__->set_primary_key("id");
 
 =head1 RELATIONS
 
+=head2 friendship_user1s
+
+Type: has_many
+
+Related object: L<Lystyng::Schema::Result::Friendship>
+
+=cut
+
+__PACKAGE__->has_many(
+  "friendship_user1s",
+  "Lystyng::Schema::Result::Friendship",
+  { "foreign.user1" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 friendship_user2s
+
+Type: has_many
+
+Related object: L<Lystyng::Schema::Result::Friendship>
+
+=cut
+
+__PACKAGE__->has_many(
+  "friendship_user2s",
+  "Lystyng::Schema::Result::Friendship",
+  { "foreign.user2" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 lists
 
 Type: has_many
@@ -124,9 +154,29 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 user1s
 
-# Created by DBIx::Class::Schema::Loader v0.07039 @ 2014-01-31 21:09:46
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:hqwt5y89b3BUVwXtE8rwag
+Type: many_to_many
+
+Composing rels: L</friendship_user2s> -> user1
+
+=cut
+
+__PACKAGE__->many_to_many("user1s", "friendship_user2s", "user1");
+
+=head2 user2s
+
+Type: many_to_many
+
+Composing rels: L</friendship_user1s> -> user2
+
+=cut
+
+__PACKAGE__->many_to_many("user2s", "friendship_user1s", "user2");
+
+
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-11-04 20:34:09
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8HxFo28ZGxXKUadEriNLnA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
