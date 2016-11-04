@@ -7,12 +7,23 @@ create table `user` (
   password char(64) not null
 ) ENGINE=INNODB CHARSET=utf8;
 
+drop table if exists 'friendship';
+create table `friendship` (
+  user1 integer not null,
+  user2 integer not null,
+  primary key (user1, user2),
+  foreign key (user1) references `user`(id),
+  foreign key (user2) references `user`(id)
+) ENGINE=INNODB CHARSET=utf8;
+
 drop table if exists `list`;
 create table list (
   id integer primary key auto_increment,
   title varchar(200) not null,
   slug varchar(200) not null,
   description text,
+  is_todo boolean,
+  privacy enum('private', 'friends', 'public'),
   user integer not null,
   foreign key (user) references `user`(id)
 ) ENGINE=INNODB CHARSET=utf8;
