@@ -17,6 +17,7 @@ my $build = Module::Build->new(
         MooseX::MarkAsMethods      => 0,
         MooseX::NonMoose           => 0,
         DBIx::Class::EncodedColumn => 0,
+        Email::Stuffer             => 0,
     },
     build_requires => {
         Test::Class => 0,
