@@ -162,6 +162,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 password_resets
+
+Type: has_many
+
+Related object: L<Lystyng::Schema::Result::PasswordReset>
+
+=cut
+
+__PACKAGE__->has_many(
+  "password_resets",
+  "Lystyng::Schema::Result::PasswordReset",
+  { "foreign.user_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 user1s
 
 Type: many_to_many
@@ -183,11 +198,8 @@ Composing rels: L</friendship_user1s> -> user2
 __PACKAGE__->many_to_many("user2s", "friendship_user1s", "user2");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-11-04 20:34:09
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8HxFo28ZGxXKUadEriNLnA
-
-
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-12-13 17:02:06
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KIsKKbvNVcgIyw6ztSET0g
 
 use Email::Stuffer;
 
@@ -217,5 +229,6 @@ EO_EMAIL
                 ->send;
 }
 
+# You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;
