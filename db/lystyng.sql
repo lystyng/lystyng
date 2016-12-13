@@ -8,6 +8,24 @@ create table `user` (
   verify char(32) null
 ) ENGINE=INNODB CHARSET=utf8;
 
+drop table if exists `password_reset`;
+create table password_reset (
+  id integer primary key auto_increment,
+  code varchar(255) not null,
+  user_id integer not null,
+  expires datetime not null default current_timestamp,
+  foreign key (user_id) references user(id)
+) ENGINE=InnoDB CHARSET=utf8;
+
+delimiter //
+create trigger insert_date before insert on password_reset
+for each row
+begin
+  set new.expires = date_add(now(), interval 12 hour);
+end;
+//
+delimiter ;
+
 drop table if exists `friendship`;
 create table `friendship` (
   user1 integer not null,
