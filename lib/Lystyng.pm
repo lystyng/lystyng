@@ -166,4 +166,52 @@ get '/logout' => sub {
   redirect uri_for('/');
 };
 
+get '/forgotpass' => sub {
+  template 'forgotpass';
+};
+
+post '/password' => sub {
+  unless (params->{email}) {
+    session 'error' => 'You must give an email address';
+    return redirect '/password';
+  }
+
+  my $email = lc params->{email};
+  my $user = $model->get_user_by_email($email);
+  unless ($user) {
+    session 'error' => "$email is not a registered email address";
+    return redirect '/forgotpass';
+  }
+
+  my $pass_code = passphrase->generate_random({
+    length  => 32,
+    charset => [ 'a' .. 'z', '0' .. '9' ],
+  });
+
+  $user->add_to_password_resets({
+    code => $pass_code,
+  });
+
+  my $body = <<EO_EMAIL;
+
+  Dear @{[$user->name]},
+
+  Here is your password reset link.
+
+  Please click on the link below to set a new password.
+
+  @{[uri_for('/passreset')]}/$pass_code
+
+EO_EMAIL
+
+  email {
+    from    => 'admin@lystyng.com',
+    to      => $user->email,
+    subject => 'Lystyng Password Change Request',
+    body    => $body,
+  };
+
+  template 'pass_sent', { user => $user };
+};
+
 1;
