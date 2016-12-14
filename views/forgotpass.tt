@@ -1,8 +1,8 @@
 <h1>Reset Password</h1>
-[% IF error -%]
+[% IF session.error -%]
 <div class="alert alert-danger alert-dismissible" role="alert">
   <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-  <strong>Error:</strong> [% error %]
+  <strong>Error:</strong> [% session.error %]
 </div>
 [% END -%]
 <p>Enter your registered email address below and we will send you a
@@ -10,12 +10,12 @@ password reset link.</p>
 <form method="POST" action="/password">
   <div class="form-group">
     <label for="email" class="col-sm-2 control-label">Email:</label>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <input type="text" name="email" id="email" class="form-control" placeholder="email address" />
     </div>
   </div>
   <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-4">
+    <div class="col-sm-offset-1 col-sm-4">
       <button type="submit" class="btn btn-default">Send link</button>
     </div>
   </div>

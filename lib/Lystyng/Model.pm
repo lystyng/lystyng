@@ -15,12 +15,22 @@ has user_rs => (
   is => 'ro',
 );
 
+has passreset_rs => (
+  isa => 'DBIx::Class::ResultSet',
+  lazy_build => 1,
+  is => 'ro',
+);
+
 sub _build_schema {
   return Lystyng::Schema->get_schema
 }
 
 sub _build_user_rs {
   return $_[0]->schema->resultset('User');
+}
+
+sub _build_passreset_rs {
+  return $_[0]->schema->resultset('PasswordReset');
 }
 
 sub get_all_users {
@@ -76,6 +86,28 @@ sub add_user {
   my ($user_data) = @_;
 
   $self->user_rs->create($user_data);
+}
+
+sub update_user_password {
+  my $self = shift;
+  my ($user, $password) = @_;
+  $user->update({ password => $password });
+}
+
+sub get_passreset_from_code {
+  my $self = shift;
+  my ($code) = @_;
+
+  return $self->passreset_rs->find({
+    code => $code,
+    expires => { '>=' => \'now()' },
+  });
+}
+
+sub clear_passreset {
+  my $self = shift;
+  my ($passreset) = @_;
+  $passreset->delete;
 }
 
 1;

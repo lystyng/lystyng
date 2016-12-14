@@ -166,7 +166,7 @@ get '/logout' => sub {
   redirect uri_for('/');
 };
 
-get '/forgotpass' => sub {
+get '/password' => sub {
   template 'forgotpass';
 };
 
@@ -192,26 +192,68 @@ post '/password' => sub {
     code => $pass_code,
   });
 
-  my $body = <<EO_EMAIL;
-
-  Dear @{[$user->name]},
-
-  Here is your password reset link.
-
-  Please click on the link below to set a new password.
-
-  @{[uri_for('/passreset')]}/$pass_code
-
-EO_EMAIL
-
-  email {
-    from    => 'admin@lystyng.com',
-    to      => $user->email,
-    subject => 'Lystyng Password Change Request',
-    body    => $body,
-  };
+  $user->send_forgot_password(uri_for('/passreset'), $pass_code);
 
   template 'pass_sent', { user => $user };
+};
+
+get '/passreset/:code' => sub {
+  my $code = route_parameters->get('code');
+  my $ps = $model->get_passreset_from_code($code);
+
+  warn "In GET /passreset/:code";
+
+  unless ($ps) {
+    warn "Can't find a code";
+    session error => "Code '$code' is not recognised. Please try again";
+    return redirect '/password';
+  }
+
+  warn "Got a code";
+
+  session error => '';
+  session code => $code;
+  template 'passreset';
+};
+
+post '/passreset' => sub {
+  my $code = session('code');
+
+  unless ($code) {
+    session error => 'Something went wrong';
+    redirect '/password';
+  }
+
+  my $ps = $model->get_passreset_from_code($code);
+  unless ($ps) {
+    session error => "Code '$code' is not recognised. Please try again";
+    redirect '/password';
+  }
+
+  session error => '';
+
+  my ($pass1, $pass2) = (
+    body_parameters->get('password'), body_parameters->get('password2')
+  );
+
+  unless ($pass1 and $pass2) {
+    session error => 'You must fill in both passwords';
+  }
+  unless ($pass1 eq $pass2) {
+    session error => 'Password values are not the same';
+  }
+
+  if (session('error')) {
+    return template 'passreset';
+  }
+
+  $model->update_user_password(
+    $ps->user, $pass1,
+  );
+
+  $model->clear_passreset($ps);
+
+  template 'passdone';
 };
 
 1;

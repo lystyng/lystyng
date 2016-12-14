@@ -18,7 +18,7 @@
     <script type="text/javascript">/* <![CDATA[ */
     !window.jQuery && document.write('<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.js"><\/script>')
 /* ]]> */</script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="[% request.uri_base %]/js/bootstrap.min.js"></script>
   </head>
   <body>
     <div class="container">

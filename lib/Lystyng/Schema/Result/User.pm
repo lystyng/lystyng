@@ -229,6 +229,31 @@ EO_EMAIL
                 ->send;
 }
 
+sub send_forgot_password {
+  my $self = shift;
+  my ($url, $pass_code) = @_;
+
+  my $name = $self->name;
+
+  my $body = <<EO_EMAIL;
+
+Dear $name,
+
+Here is your password reset link.
+
+Please click on the link below to set a new password.
+
+* $url/$pass_code
+
+EO_EMAIL
+
+  Email::Stuffer->from('admin@lystyng.com')
+                ->to($self->email)
+		->subject('Lystyng: Password Reset')
+		->text_body($body)
+		->send;
+}
+
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;
