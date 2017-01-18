@@ -1,5 +1,10 @@
+      <div class="jumbotron">
+        <h1><span class="glyphicon glyphicon-list"></span> Lystyng</h1>
+        <p class="lead">For the groceries. And everything else.</p>
+        <hr>
 [% IF session.user -%]
   <p>Welcome [% session.user.name %] [<a href="/logout">Log out</a>]</p>
 [% ELSE %]
   <p><a href="/login">Log in</a> or <a href="/register">Register</a></p>
 [% END -%]
+      </div>

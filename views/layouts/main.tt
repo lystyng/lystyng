@@ -8,6 +8,8 @@
     <link rel="icon" type="image/x-icon" href="[% request.uri_base %]/favicon.ico" />
     <link rel="stylesheet" href="[% request.uri_base %]/css/bootstrap.min.css" />
     <link rel="stylesheet" href="[% request.uri_base %]/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href="css/jumbotron-narrow.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -21,32 +23,42 @@
     <script src="[% request.uri_base %]/js/bootstrap.min.js"></script>
   </head>
   <body>
-    <div class="container">
-      <!-- Static navbar -->
-      <div class="navbar navbar-inverse" role="navigation">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="#">Lystyng</a>
-          </div>
-          <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-right">
-[% IF session.user -%]
-              <li>Welcome [% session.user.name %] <a href="/logout">Log out</a></li>
-[% ELSE -%]
-              <li><a href="/register">Register</a> / <a href="/login">Log in</a></li>
-[% END -%]
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div><!--/.container-fluid -->
-      </div>
+    <div class="navbar navbar-inverse" role="navigation">
       <div class="container">
-[% content %]
-      </div>
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Lystyng</a>
+        </div>
 
-    <div id="footer">
-      <div class="container">
-        <p class="text-muted">Powered by <a href="http://perldancer.org/">Dancer</a> [% dancer_version %]</p>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="/albums/">Albums</a></li>
+            <li><a href="/artists/">Artists</a></li>
+            <li><a href="/songs/">Songs</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+           <li><a href="/register">Register</a></li>
+           <li><a href="/login">Login</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
       </div>
     </div>
+    <!-- Static navbar -->
+    <div class="container">
+[% content %]
+    </div>
+
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+      <div class="container">
+        <p class="text-muted">Made by
+	  <a href="https://twitter.com/davorg">@davorg</a>.</p>
+      </div>
+    </nav>
   </body>
 </html>
