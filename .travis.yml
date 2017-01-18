@@ -27,3 +27,6 @@ script:
 after_success:
   - cover +ignore ^t/ +ignore ^/home/travis -report coveralls
 
+addons:
+  mariadb: '10.1'
+
