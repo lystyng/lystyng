@@ -18,7 +18,7 @@ install:
   - export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=c HARNESS_TIMER=1
   - cpanm --quiet --notest Devel::Cover
   - cpanm --quiet --notest Devel::Cover::Report::Coveralls
-  - sudo apt-get install libdbd-mysql-perl
+  - sudo apt-get install apt-get install libmariadbclient-dev
   - cpanm --quiet --notest --installdeps .
 
 script:
