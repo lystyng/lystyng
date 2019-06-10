@@ -11,6 +11,7 @@ perl:
 env: LYSTYNG_DB_SERVER=localhost LYSTYNG_DB_NAME=lystyng LYSTYNG_DB_USER=travis LYSTYNG_DB_PASS=''
 
 before_script:
+  - yum -y install make gcc mariadb-devel
   - mysql -e 'create database lystyng;'
   - mysql -D lystyng < db/lystyng.sql
 
