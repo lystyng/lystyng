@@ -152,6 +152,21 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-12-13 17:02:06
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:pM2ICOHgk/mW5nGl29Dwtg
 
+sub json_data {
+  my $self = shift;
+  
+  return {
+    title => $self->title,
+    slug => $self->slug,
+    url => $self->url,
+  };
+}
+
+sub url {
+  my $self = shift;
+  
+  return $self->user->url . '/list/' . $self->slug;
+}
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;

@@ -20,9 +20,9 @@ get '/' => sub {
 
 prefix '/user' => sub {
   get '' => sub {
-    template 'users', {
-      users => [ $model->get_all_users ],
-    };
+    my @users = map { $_->json_data } $model->get_all_users;
+    
+    return \@users; 
   };
 
   get '/:username' => sub {
@@ -32,9 +32,10 @@ prefix '/user' => sub {
 
     send_error 'User not found', 404 unless $user;
 
-    template 'user', {
-      user => $user,
-    };
+    my $data = $user->json_data;
+    $data->{lists} = [ map { $_->json_data } $model->get_users_lists($user) ];
+
+    return $data;
   };
 
   get '/:username/list/:list' => sub {
@@ -50,9 +51,7 @@ prefix '/user' => sub {
 
     send_error 'List not found', 404 unless $list;
 
-    template 'list', {
-      list => $list,
-    };
+    return $list->json_data;
   };
 };
 
@@ -81,8 +80,10 @@ get '/register' => sub {
 post '/register' => sub {
   my ($user_data, @errors);
 
+  my $input = body_parameters->mixed;
+
   foreach (qw[username name email password password2]) {
-    if (defined (my $val = body_parameters->get($_))) {
+    if (defined (my $val = $input->{$_})) {
       $user_data->{$_} = $val;
     } else {
       push @errors, qq[Field "$_" is missing];
@@ -90,27 +91,33 @@ post '/register' => sub {
   }
 
   if (@errors) {
-    return template 'register', {
+    return {
+      status => 401,
+      message => 'Cannot create user',
       errors => \@errors,
     };
   }
 
-  if ($user_data->{password} ne $user_data->{password2}) {
-    push @errors, 'Your passwords do not match.';
-  }
+  # It's only worth checking this stuff if we have a valid set of data
+  if (!@errors) {
+    if ($user_data->{password} ne $user_data->{password2}) {
+      push @errors, 'Your passwords do not match.';
+    }
 
-  my ($user) = $model->get_user_by_username($user_data->{username});
-  if ($user) {
-    push @errors, "Username '$user_data->{username}' is already in use.";
-  };
+    my ($old_user) = $model->get_user_by_username($user_data->{username});
+    if ($old_user) {
+      push @errors, "Username '$user_data->{username}' is already in use.";
+    };
 
-  ($user) = $model->get_user_by_email($user_data->{email});
-  if ($user) {
-    push @errors, "Email address '$user_data->{email}' is already registered.";
+    ($old_user) = $model->get_user_by_email($user_data->{email});
+    if ($old_user) {
+      push @errors, "Email address '$user_data->{email}' is already registered.";
+    }
   }
 
   if (@errors) {
-    return template 'register', {
+    return {
+      status => 403,
       errors => \@errors,
     };
   }
@@ -121,13 +128,16 @@ post '/register' => sub {
     charset => [ 'a' .. 'z', 'A' .. 'Z', 0 .. 9],
   });
 
-  $user = $model->add_user( $user_data );
+  my $user = $model->add_user( $user_data );
 
   $user->send_verify(uri_for('/verify'));
 
   session user => $user;
 
-  redirect uri_for('/user/' . $user->username);
+  return {
+    status => 201,
+    message => "User '$user_data->{username}' created successfully",
+  };
 };
 
 get '/verify/:code' => sub {
@@ -136,13 +146,15 @@ get '/verify/:code' => sub {
     verify => $code,
   );
 
-  unless ($user) {
-    return 'That verification code is invalid';
-  }
+  send_error 'That verification code is invalid', 404
+    unless $user;
 
-  $user->update({ verify => undef });
+  $model->verify_user($user);
 
-  redirect uri_for('/user/' . $user->username);
+  return {
+    status => 200,
+    message => 'User verified successfully',
+  };
 };
 
 get '/login' => sub {
@@ -153,17 +165,18 @@ post '/login' => sub {
   my ($user) = $model->get_user_by_username(body_parameters->get('username'));
   if ($user && $user->check_password(body_parameters->get('password'))) {
     session user => $user;
-    redirect uri_for('/user/' . $user->username);
-  } else {
-    template 'login', {
-      error    => 1,
+    return {
+      status => '200',
+      message => 'User ' . $user->username . ' logged in successfully',
     };
+  } else {
+    send_error 'Login unsuccessful', 403;
   }
 };
 
 get '/logout' => sub {
   session user => undef;
-  redirect uri_for('/');
+  return { status => 200, message => 'User logged out' };
 };
 
 get '/password' => sub {
@@ -171,16 +184,20 @@ get '/password' => sub {
 };
 
 post '/password' => sub {
-  unless (params->{email}) {
-    session 'error' => 'You must give an email address';
-    return redirect '/password';
+  unless (body_parameters->{email}) {
+    return {
+      status => 400,
+      message => 'email address missing',
+    };
   }
 
   my $email = lc params->{email};
   my $user = $model->get_user_by_email($email);
   unless ($user) {
-    session 'error' => "$email is not a registered email address";
-    return redirect '/forgotpass';
+    return {
+      status => 400,
+      message => "$email is not a registered email address",
+    }
   }
 
   my $pass_code = passphrase->generate_random({
@@ -188,13 +205,13 @@ post '/password' => sub {
     charset => [ 'a' .. 'z', '0' .. '9' ],
   });
 
-  $user->add_to_password_resets({
-    code => $pass_code,
-  });
-
+  $model->add_password_reset($user, $pass_code);
   $user->send_forgot_password(uri_for('/passreset'), $pass_code);
 
-  template 'pass_sent', { user => $user };
+  return {
+    status => 200,
+    message => 'Password reset code sent to user',
+  };
 };
 
 get '/passreset/:code' => sub {
@@ -205,46 +222,50 @@ get '/passreset/:code' => sub {
 
   unless ($ps) {
     warn "Can't find a code";
-    session error => "Code '$code' is not recognised. Please try again";
-    return redirect '/password';
+    send_error "Code '$code' is not recognised. Please try again", 404;
   }
 
   warn "Got a code";
 
-  session error => '';
-  session code => $code;
-  template 'passreset';
+  return {
+    status => 200,
+    code => $code,
+  }
 };
 
 post '/passreset' => sub {
-  my $code = session('code');
+  my $code = body_parameters->{'code'};
 
   unless ($code) {
-    session error => 'Something went wrong';
-    redirect '/password';
+    return {
+      status => 400,
+      message => 'Reset code missing',
+    }
   }
 
   my $ps = $model->get_passreset_from_code($code);
   unless ($ps) {
-    session error => "Code '$code' is not recognised. Please try again";
-    redirect '/password';
+    return {
+      status => 400,
+      message => "Code $code is no longer valid",
+    };
   }
-
-  session error => '';
 
   my ($pass1, $pass2) = (
     body_parameters->get('password'), body_parameters->get('password2')
   );
 
   unless ($pass1 and $pass2) {
-    session error => 'You must fill in both passwords';
+    return {
+      status => 400,
+      message => 'Must fill in both password fields',
+    }
   }
   unless ($pass1 eq $pass2) {
-    session error => 'Password values are not the same';
-  }
-
-  if (session('error')) {
-    return template 'passreset';
+    return {
+      status => 400,
+      message => 'Password values are not the same',
+    };
   }
 
   $model->update_user_password(
@@ -253,7 +274,10 @@ post '/passreset' => sub {
 
   $model->clear_passreset($ps);
 
-  template 'passdone';
+  return {
+    status => 200,
+    message => 'Password reset successfully',
+  };
 };
 
 1;

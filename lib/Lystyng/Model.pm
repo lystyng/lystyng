@@ -74,6 +74,13 @@ sub get_user_list_by_slug {
   });
 }
 
+sub get_users_lists {
+  my $self = shift;
+  my ($user) = @_;
+  
+  return $user->lists;
+}
+
 sub add_user_list {
   my $self = shift;
   my ($user, $list_data) = @_;
@@ -92,6 +99,21 @@ sub update_user_password {
   my $self = shift;
   my ($user, $password) = @_;
   $user->update({ password => $password });
+}
+
+sub verify_user {
+  my $self = shift;
+  
+  my ($user) = @_;
+  
+  $user->update({ verify => undef });
+}
+
+sub add_password_reset {
+  my $self = shift;
+  my ($user, $code) = @_;
+  
+  $user->add_to_password_resets({ code => $code });
 }
 
 sub get_passreset_from_code {

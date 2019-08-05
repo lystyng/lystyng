@@ -27,6 +27,8 @@ engines:
       start_tag: '[%'
       end_tag:   '%]'
 
+serializer: "JSON"
+
 session: "simple"
 
 plugins:

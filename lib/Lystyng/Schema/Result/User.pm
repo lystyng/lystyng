@@ -203,6 +203,23 @@ __PACKAGE__->many_to_many("user2s", "friendship_user1s", "user2");
 
 use Email::Stuffer;
 
+sub json_data {
+  my $self = shift;
+  
+  return {
+    name => $self->name,
+    username => $self->username,
+    url => $self->url,
+    email => $self->email,
+  };
+}
+
+sub url {
+  my $self = shift;
+  
+  return '/user/' . $self->username;
+}
+
 sub send_verify {
   my $self = shift;
   my ($url) = @_;
