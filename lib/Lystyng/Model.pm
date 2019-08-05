@@ -132,4 +132,15 @@ sub clear_passreset {
   $passreset->delete;
 }
 
+sub add_item_to_user_list {
+  my $self = shift;
+  my ($username, $list_slug, $item) = @_;
+
+  my $user = $self->get_user_by_username($username);
+
+  my $list = $self->get_user_list_by_slug($user, $list_slug);
+
+  return $list->add_to_list_items($item);
+}
+
 1;

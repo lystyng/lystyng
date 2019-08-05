@@ -154,12 +154,21 @@ __PACKAGE__->belongs_to(
 
 sub json_data {
   my $self = shift;
+  my ($include) = @_;
   
-  return {
+  my $data = {
     title => $self->title,
     slug => $self->slug,
     url => $self->url,
   };
+
+  if ($include->{items}) {
+    $data->{items} = [
+      map { $_->json_data } $self->list_items,
+    ];
+  }
+
+  return $data;
 }
 
 sub url {

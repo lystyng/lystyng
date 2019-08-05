@@ -95,6 +95,14 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07043 @ 2016-01-15 12:36:39
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v3Bb+MB+Puax/tKqgmw2WQ
 
+sub json_data {
+  my $self = shift;
+
+  return {
+    title => $self->title,
+    description => $self->description,
+  };
+}
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;

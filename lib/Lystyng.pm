@@ -39,19 +39,42 @@ prefix '/user' => sub {
   };
 
   get '/:username/list/:list' => sub {
-    my $user = $model->get_user_by_username(
-      route_parameters->get('username'),
-    );
+    my $username = route_parameters->get('username');
+    my $listslug = route_parameters->get('list');
+
+    my $user = $model->get_user_by_username($username);
 
     send_error 'User not found', 404 unless $user;
 
-    my $list = $model->get_user_list_by_slug(
-      $user, route_parameters->get('list'),
-    );
+    my $list = $model->get_user_list_by_slug($user, $listslug);
 
     send_error 'List not found', 404 unless $list;
 
-    return $list->json_data;
+    return $list->json_data({ items => 1 });
+  };
+
+  post '/:username/list/:list/item' => sub {
+    my $username = route_parameters->get('username');
+    my $listslug = route_parameters->get('list');
+
+    my $user = $model->get_user_by_username($username);
+
+    send_error 'User not found', 404 unless $user;
+
+    my $list = $model->get_user_list_by_slug($user, $listslug);
+
+    send_error 'List not found', 404 unless $list;
+
+    my $item = { map {
+      $_ => body_parameters->get($_);
+    } (qw[ title description ]) };
+
+    $model->add_item_to_user_list($username, $listslug, $item);
+
+    return {
+      status => 201,
+      message => 'List item created successfully',
+    };
   };
 };
 
@@ -68,8 +91,10 @@ prefix '/list' => sub {
 
     $model->add_user_list($user, $list_data);
 
-    redirect uri_for('/user/' . $user->username .
-                     '/list/' . $list_data->{slug});
+    return {
+      status => '201',
+      message => 'List created successfully',
+    };
   };
 };
 
