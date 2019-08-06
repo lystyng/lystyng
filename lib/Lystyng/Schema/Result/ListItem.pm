@@ -49,6 +49,11 @@ __PACKAGE__->table("list_item");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 seq_no
+
+  data_type: 'integer'
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -60,6 +65,8 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 1 },
   "list",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "seq_no",
+  { data_type => "integer", is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -92,8 +99,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07043 @ 2016-01-15 12:36:39
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:v3Bb+MB+Puax/tKqgmw2WQ
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-06 09:22:23
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:dRNbY7YO5MirARKiySS8yg
 
 sub json_data {
   my $self = shift;

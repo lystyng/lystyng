@@ -198,8 +198,8 @@ Composing rels: L</friendship_user1s> -> user2
 __PACKAGE__->many_to_many("user2s", "friendship_user1s", "user2");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-12-13 17:02:06
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KIsKKbvNVcgIyw6ztSET0g
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-06 09:16:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zjIfnFkjRj87nB8L23/ZJQ
 
 use Email::Stuffer;
 

@@ -48,7 +48,7 @@ __PACKAGE__->table("password_reset");
 
   data_type: 'datetime'
   datetime_undef_if_invalid: 1
-  default_value: 'CURRENT_TIMESTAMP'
+  default_value: 'current_timestamp()'
   is_nullable: 0
 
 =cut
@@ -64,7 +64,7 @@ __PACKAGE__->add_columns(
   {
     data_type => "datetime",
     datetime_undef_if_invalid => 1,
-    default_value => "CURRENT_TIMESTAMP",
+    default_value => "current_timestamp()",
     is_nullable => 0,
   },
 );
@@ -99,8 +99,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2016-12-13 16:53:36
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:dq6/CW2qqfKxNt5DfTQlvA
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-06 09:16:56
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:5ct+KVlNQhRGlpyRgYbJCw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

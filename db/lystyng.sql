@@ -68,6 +68,7 @@ create table list_item (
   title varchar(200) not null,
   description text,
   list integer not null,
+  seq_no integer not null,
   foreign key (list) references list(id)
 ) ENGINE=INNODB CHARSET=utf8;
 
