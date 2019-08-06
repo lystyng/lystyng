@@ -67,13 +67,68 @@ prefix '/user' => sub {
 
     my $item = { map {
       $_ => body_parameters->get($_);
-    } (qw[ title description ]) };
+    } (qw[ seq_no title description ]) };
+
+    if (!$item->{seq_no}) {
+      if ($list->list_items->count) {
+        my $max = $list->list_items->get_column('seq_no')->max;
+        $item->{seq_no} = ++$max;
+      } else {
+        $item->{seq_no} = 1;
+      }
+    }
 
     $model->add_item_to_user_list($username, $listslug, $item);
 
     return {
       status => 201,
       message => 'List item created successfully',
+    };
+  };
+
+  del '/:username/list/:list/item/:seq_no' => sub {
+    my $username = route_parameters->get('username');
+    my $listslug = route_parameters->get('list');
+    my $seq      = route_parameters->get('seq_no');
+
+    my $user = $model->get_user_by_username($username);
+
+    send_error 'User not found', 404 unless $user;
+
+    my $list = $model->get_user_list_by_slug($user, $listslug);
+
+    send_error 'List not found', 404 unless $list;
+
+    my $item = $list->list_items->find({ seq_no => $seq });
+
+    send_error 'List item not found', 404 unless $item;
+
+    $item->delete;
+
+    return {
+      status => 200,
+      message => 'List item deleted successfully',
+    };
+  };
+
+  del '/:username/list/:list' => sub {
+    my $username = route_parameters->get('username');
+    my $listslug = route_parameters->get('list');
+
+    my $user = $model->get_user_by_username($username);
+
+    send_error 'User not found', 404 unless $user;
+
+    my $list = $model->get_user_list_by_slug($user, $listslug);
+
+    send_error 'List not found', 404 unless $list;
+
+    $list->list_items->delete;
+    $list->delete;
+
+    return {
+      status => 200,
+      message => 'List deleted successfully',
     };
   };
 };
