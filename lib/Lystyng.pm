@@ -15,7 +15,7 @@ use Lystyng::Model;
 my $model = Lystyng::Model->new;
 
 get '/' => sub {
-  template 'index';
+  send_file '/index.html';
 };
 
 prefix '/user' => sub {
@@ -36,6 +36,30 @@ prefix '/user' => sub {
     $data->{lists} = [ map { $_->json_data } $model->get_users_lists($user) ];
 
     return $data;
+  };
+
+  post '/:username/list/add' => sub {
+    my $username = route_parameters->get('username');
+
+    my $user = $model->get_user_by_username($username);
+
+    send_error 'User not found', 404 unless $user;
+
+    my $list_data;
+    $list_data->{$_} = body_parameters->get($_)
+      for (qw[title slug description]);
+
+    # Check for existing list with that slug
+    my $old_list =  $model->get_user_list_by_slug($user, $list_data->{slug});
+    
+    send_error 'List already exists' if $old_list;
+
+    $model->add_user_list($user, $list_data);
+
+    return {
+      status => '201',
+      message => 'List created successfully',
+    };
   };
 
   get '/:username/list/:list' => sub {
@@ -111,6 +135,67 @@ prefix '/user' => sub {
     };
   };
 
+  patch '/:username/list/:list' => sub {
+    my $username = route_parameters->get('username');
+    my $listslug = route_parameters->get('list');
+
+    my $user = $model->get_user_by_username($username);
+
+    send_error 'User not found', 404 unless $user;
+
+    my $list = $model->get_user_list_by_slug($user, $listslug);
+
+    send_error 'List not found', 404 unless $list;
+    
+    my $new_list_values;
+    for (qw[ title description slug ]) {
+      my $value = body_parameters->get($_);
+      $new_list_values->{$_} = $value if defined $value;
+    }
+    
+    if (keys %$new_list_values) {
+use Data::Dumper;
+warn Dumper $new_list_values;
+      $list->update($new_list_values);
+      return {
+        status => 200,
+        message => 'List updated successfully',
+      };
+    }
+  };
+
+  patch '/:username/list/:list/item/:seq_no' => sub {
+    my $username = route_parameters->get('username');
+    my $listslug = route_parameters->get('list');
+    my $seq      = route_parameters->get('seq_no');
+
+    my $user = $model->get_user_by_username($username);
+
+    send_error 'User not found', 404 unless $user;
+
+    my $list = $model->get_user_list_by_slug($user, $listslug);
+
+    send_error 'List not found', 404 unless $list;
+
+    my $item = $list->list_items->find({ seq_no => $seq });
+
+    send_error 'List item not found', 404 unless $item;
+    
+    my $new_item_values;
+    for (qw[ title description seq_no ]) {
+      my $value = body_parameters->get($_);
+      $new_item_values->{$_} = $value if defined $value;
+    }
+    
+    if (keys %$new_item_values) {
+      $item->update($new_item_values);
+      return {
+        status => 200,
+        message => 'List item updated successfully',
+      };
+    }
+  };
+
   del '/:username/list/:list' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
@@ -136,20 +221,6 @@ prefix '/user' => sub {
 prefix '/list' => sub {
   get '/add' => needs login => sub {
     template 'addlist';
-  };
-
-  post '/add' => needs login => sub {
-    my $user = session('user');
-    my $list_data;
-    $list_data->{$_} = body_parameters->get("list_$_")
-      for (qw[title slug description]);
-
-    $model->add_user_list($user, $list_data);
-
-    return {
-      status => '201',
-      message => 'List created successfully',
-    };
   };
 };
 
@@ -250,6 +321,7 @@ post '/login' => sub {
       message => 'User ' . $user->username . ' logged in successfully',
     };
   } else {
+    warn "Login unsuccessful";
     send_error 'Login unsuccessful', 403;
   }
 };

@@ -31,7 +31,7 @@ $test_user->delete if $test_user;
 my %route = (
   register => 200,
   login    => 200,
-  logout   => 302,
+  logout   => 200,
 );
 
 for (keys %route) {
