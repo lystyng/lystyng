@@ -13,6 +13,7 @@ sub basic : Tests {
   my $list_rs = $self->schema->resultset('List');
   my $item_rs = $self->schema->resultset('ListItem');
   my $user = $user_rs->create({
+    name     => 'Test User',
     username => 'user',
     password => 'pass',
     email    => 'user@example.com',

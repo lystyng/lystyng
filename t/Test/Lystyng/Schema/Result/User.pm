@@ -11,6 +11,7 @@ sub basic : Tests {
 
   my $user_rs = $self->schema->resultset('User');
   my $user = $user_rs->create({
+    name     => 'Test User',
     username => 'user',
     password => 'pass',
     email    => 'user@example.com',
