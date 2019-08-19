@@ -4,6 +4,7 @@ use Test::More;
 use Plack::Test;
 use HTTP::Request::Common;
 use HTTP::Cookies;
+use JSON;
 
 use lib 'lib';
 
@@ -51,8 +52,8 @@ my %routes = (
       content => '/login',
     },
     in => {
-      code    => 200,
-      content => 'Add',
+      code    => 302,
+      content => '/login',
     },
   },
 );
@@ -66,10 +67,13 @@ my $user = $sch->resultset('User')->create( $test_user_data );
 
 BAIL_OUT('User not created, no point in continuing') unless $user;
 
-my $res = $test->request(POST "$base_url/login", [
-  username => $test_user_data->{username},
-  password => $test_user_data->{password},
-]);
+my $res = $test->request(POST "$base_url/login", 
+  Content_type => 'application/json',
+  Content => {
+    username => $test_user_data->{username},
+    password => $test_user_data->{password},
+  },
+);
 
 diag('Login response code: ', $res->code);
 
