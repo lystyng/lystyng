@@ -24,9 +24,9 @@ matrix:
 env: LYSTYNG_DB_SERVER=127.0.0.1 LYSTYNG_DB_NAME=lystyng LYSTYNG_DB_USER=travis LYSTYNG_DB_PASS=''
 
 before_script:
-  - mysql -e 'create database lystyng;'
-  - mysql -e "create user '$LYSTYNG_DB_USER'@'localhost' identified by '$LYSTYNG_DB_PASS';"
-  - mysql -e "grant all on lystyng.* to '$LYSTYNG_DB_USER'@'localhost';"
+  - mysql -e "create database $LYSTYNG_DB_NAME;"
+  - mysql -e "create user '$LYSTYNG_DB_USER'@'$LYSTYNG_DB_SERVER' identified by '$LYSTYNG_DB_PASS';"
+  - mysql -e "grant all on $LYSTYNG_DB_NAME.* to '$LYSTYNG_DB_USER'@'$LYSTYNG_DB_SERVER';"
   - mysql -D lystyng < db/lystyng.sql
 
 install:
