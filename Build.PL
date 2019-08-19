@@ -11,6 +11,7 @@ my $build = Module::Build->new(
         Dancer2     => 0.166001,
         Template    => 0,
         Plack::Test => 0,
+        JSON        => 0,
         Dancer2::Plugin::DBIC      => 0,
         Dancer2::Plugin::Auth::Tiny => 0,
         Dancer2::Plugin::Passphrase => 0,
