@@ -15,7 +15,7 @@ use Lystyng::Model;
 my $model = Lystyng::Model->new;
 
 get '/' => sub {
-  send_file '/index.html';
+  send_as html => template 'index.tt';
 };
 
 prefix '/user' => sub {
