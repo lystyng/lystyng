@@ -15,7 +15,8 @@ env: LYSTYNG_DB_SERVER=127.0.0.1 LYSTYNG_DB_NAME=lystyng LYSTYNG_DB_USER=travis 
 
 before_script:
   - mysql -e 'create database lystyng;'
-  - mysql -e "grant all on lystyng.* to '$LYSTYNG_DB_USER'@'localhost' identified by '$LYSTYNG_DB_PASS';"
+  - mysql -e "create user '$LYSTYNG_DB_USER'@'localhost' identified by '$LYSTYNG_DB_PASS';"
+  - mysql -e "grant all on lystyng.* to '$LYSTYNG_DB_USER'@'localhost';"
   - mysql -D lystyng < db/lystyng.sql
 
 install:
