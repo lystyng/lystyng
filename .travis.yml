@@ -11,7 +11,7 @@ perl:
   - "5.16"
   - "5.14"
 
-env: LYSTYNG_DB_SERVER=localhost LYSTYNG_DB_NAME=lystyng LYSTYNG_DB_USER=travis LYSTYNG_DB_PASS=''
+env: LYSTYNG_DB_SERVER=127.0.0.1 LYSTYNG_DB_NAME=lystyng LYSTYNG_DB_USER=travis LYSTYNG_DB_PASS=''
 
 before_script:
   - mysql -e 'create database lystyng;'
