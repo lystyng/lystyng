@@ -25,7 +25,8 @@ sub basic : Tests {
 
   my $list = $user->lists->first;
   my $item = $list->add_to_list_items({
-    title => 'test item',
+    seq_no => 1,
+    title  => 'test item',
   });
 
   ok($item, 'Got an item_rs');
