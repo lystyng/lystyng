@@ -231,10 +231,8 @@ get '/register' => sub {
 post '/register' => sub {
   my ($user_data, @errors);
 
-  my $input = body_parameters->mixed;
-
   foreach (qw[username name email password password2]) {
-    if (defined (my $val = $input->{$_})) {
+    if (defined (my $val = body_parameters->get($_))) {
       $user_data->{$_} = $val;
     } else {
       push @errors, qq[Field "$_" is missing];

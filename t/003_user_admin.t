@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use Plack::Test;
 use HTTP::Request::Common;
+use JSON;
 
 use lib 'lib';
 use Lystyng;
@@ -39,7 +40,10 @@ for (keys %route) {
   is( $res->code, $route{$_}, "response status is $route{$_} for /$_" );
 }
 
-my $res = $test->request(POST '/register', [ %$test_user_data ]);
+my $res = $test->request(POST '/register',
+  Content_type => 'application/json',
+  Content => encode_json($test_user_data),
+);
 
 ok $res, 'Got a response from /register';
 is $res->code, 200, 'Response is 200';
@@ -47,17 +51,24 @@ like $res->content, qr[is missing], 'Password2 is missing';
 
 $test_user_data->{password2} = 'Something else';
 
-$res = $test->request(POST '/register', [ %$test_user_data ]);
+$res = $test->request(POST '/register',
+  Content_type => 'application/json',
+  Content => encode_json($test_user_data),
+);
 
 ok $res, 'Got a response from /register';
 is $res->code, 200, 'Response is 200';
-like $res->content, qr[do not match], 'Passwords do not match';
+like $res->content, qr[do not match], 'Passwords do not match'
+  or diag $res->content;
 
 $test_user_data->{password2} = 'TEST';
-$res = $test->request(POST '/register', [ %$test_user_data ]);
+$res = $test->request(POST '/register', 
+  Content_type => 'application/json',
+  Content => encode_json($test_user_data),
+);
 
 ok $res, 'Got a response from /register';
-is $res->code, 302, 'Response is 302';
+is $res->code, 200, 'Response is 200';
 
 # Clean up after ourselves
 $test = $sch->resultset('User')->find({
