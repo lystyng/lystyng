@@ -387,18 +387,12 @@ post '/passreset' => sub {
   my $code = body_parameters->{'code'};
 
   unless ($code) {
-    return {
-      status => 400,
-      message => 'Reset code missing',
-    }
+    send_error 'Reset code missing', 400;
   }
 
   my $ps = $model->get_passreset_from_code($code);
   unless ($ps) {
-    return {
-      status => 400,
-      message => "Code $code is no longer valid",
-    };
+    send_error "Code $code is no longer valid", 400;
   }
 
   my ($pass1, $pass2) = (
@@ -406,16 +400,10 @@ post '/passreset' => sub {
   );
 
   unless ($pass1 and $pass2) {
-    return {
-      status => 400,
-      message => 'Must fill in both password fields',
-    }
+    send_error 'Must fill in both password fields', 400;
   }
   unless ($pass1 eq $pass2) {
-    return {
-      status => 400,
-      message => 'Password values are not the same',
-    };
+    send_error 'Password values are not the same', 400;
   }
 
   $model->update_user_password(

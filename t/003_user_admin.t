@@ -99,14 +99,14 @@ $res = $test->request(POST '/passreset',
   Content_type => 'application/json',
   Content => encode_json({ 
     code      => $code,
-    password1 => 'Newpass',
+    password  => 'Newpass',
     password2 => 'Newpass',
   }),
 );
 
 ok $res, 'Got a response from /passreset';
-is $res->code, 200, 'Response is 200'
-  or diag $res->content;
+is $res->code, 200, 'Response is 200';
+diag $res->content;
 
 # Clean up after ourselves
 $user->password_resets->delete;
