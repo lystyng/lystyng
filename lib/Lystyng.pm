@@ -38,7 +38,7 @@ prefix '/users' => sub {
     return $data;
   };
 
-  post '/:username/list/add' => sub {
+  post '/:username/lists' => sub {
     my $username = route_parameters->get('username');
 
     my $user = $model->get_user_by_username($username);
@@ -62,7 +62,7 @@ prefix '/users' => sub {
     };
   };
 
-  get '/:username/list/:list' => sub {
+  get '/:username/lists/:list' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
 
@@ -77,7 +77,7 @@ prefix '/users' => sub {
     return $list->json_data({ items => 1 });
   };
 
-  post '/:username/list/:list/item' => sub {
+  post '/:username/lists/:list/items' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
 
@@ -110,7 +110,7 @@ prefix '/users' => sub {
     };
   };
 
-  del '/:username/list/:list/item/:seq_no' => sub {
+  del '/:username/lists/:list/items/:seq_no' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
     my $seq      = route_parameters->get('seq_no');
@@ -135,7 +135,7 @@ prefix '/users' => sub {
     };
   };
 
-  patch '/:username/list/:list' => sub {
+  patch '/:username/lists/:list' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
 
@@ -164,7 +164,7 @@ warn Dumper $new_list_values;
     }
   };
 
-  patch '/:username/list/:list/item/:seq_no' => sub {
+  patch '/:username/lists/:list/items/:seq_no' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
     my $seq      = route_parameters->get('seq_no');
@@ -196,7 +196,7 @@ warn Dumper $new_list_values;
     }
   };
 
-  del '/:username/list/:list' => sub {
+  del '/:username/lists/:list' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
 

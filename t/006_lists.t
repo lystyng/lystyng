@@ -39,7 +39,7 @@ my $user = $sch->resultset('User')->find({
   username => $test_user_data->{username},
 });
 
-$res = $test->request(POST "/users/$test_user_data->{username}/list/add",
+$res = $test->request(POST "/users/$test_user_data->{username}/lists",
   Content_type => 'application/json',
   Content => encode_json({
     title       => 'Test List',
@@ -53,7 +53,7 @@ is($res->code, 200, 'Status is 200');
 
 my $list = $user->lists->first;
 
-my $url = "/users/$test_user_data->{username}/list/test_list/item";
+my $url = "/users/$test_user_data->{username}/lists/test_list/items";
 $res = $test->request(POST $url,
   Content_type => 'application/json',
   Content => encode_json({
@@ -66,7 +66,7 @@ $res = $test->request(POST $url,
 ok($res, 'Got a response from adding a list item');
 is($res->code, 200, 'Status is 200');
 
-$res = $test->request(GET "/users/$test_user_data->{username}/list/test_list");
+$res = $test->request(GET "/users/$test_user_data->{username}/lists/test_list");
 
 ok($res, 'Got a response from getting a list');
 is($res->code, 200, 'Status is 200');
