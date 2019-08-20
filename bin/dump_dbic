@@ -15,7 +15,7 @@ make_schema_at(
     },
     custom_column_info => \&encode_password,
   }, [
-    "dbi:mysql:dbname=$ENV{LYSTYNG_DB_NAME};host=$ENV{LYSTYNG_DB_SERVER}",
+    "dbi:mysql:dbname=$ENV{LYSTYNG_DB_NAME};host=$ENV{LYSTYNG_DB_HOST}",
     $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS},
   ],
 );

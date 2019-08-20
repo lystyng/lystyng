@@ -21,7 +21,7 @@ use Carp;
 
 sub check_env {
   my @errors;
-  foreach (qw[LYSTYNG_DB_SERVER LYSTYNG_DB_NAME
+  foreach (qw[LYSTYNG_DB_HOST LYSTYNG_DB_NAME
               LYSTYNG_DB_USER LYSTYNG_DB_PASS]) {
     push @errors, $_ unless defined $ENV{$_};
   }
@@ -35,7 +35,7 @@ sub get_schema {
   __PACKAGE__->check_env();
 
   return __PACKAGE__->connect(
-    "dbi:mysql:hostname=$ENV{LYSTYNG_DB_SERVER};database=$ENV{LYSTYNG_DB_NAME}",
+    "dbi:mysql:hostname=$ENV{LYSTYNG_DB_HOST};database=$ENV{LYSTYNG_DB_NAME}",
     $ENV{LYSTYNG_DB_USER}, $ENV{LYSTYNG_DB_PASS}
   );
 }
