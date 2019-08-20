@@ -14,11 +14,12 @@ has schema => (
   isa     => 'Lystyng::Schema',
   lazy    => 1,
   builder => '_build_schema',
+  clearer => '_clear_schema',
 );
 
 sub _build_schema {
   my $schema = eval { Lystyng::Schema->get_schema };
-  BAIL_OUT($@) if $@;
+  die ($@) if $@;
   return $schema;
 }
 

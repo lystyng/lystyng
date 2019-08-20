@@ -16,6 +16,21 @@ sub check_connect : Tests {
   isa_ok($sch, 'Lystyng::Schema');
 }
 
+sub broken_connect : Tests {
+  my $self = shift;
+
+  local %ENV;
+
+  for (qw[ HOST NAME USER PASS ]) {
+    delete $ENV{"LYSTYNG_DB_$_"};
+  }
+
+  $self->_clear_schema;
+  my $sch = eval { $self->schema };
+
+  ok($@, 'Schema error with missing env variables');
+}
+
 sub check_rs : Tests {
   my $sch = shift->schema;
 
