@@ -42,7 +42,7 @@ script:
   - cover
 
 after_success:
-  - cover -ignore ^t/ -ignore ^/home/travis -report coveralls
+  - cover -ignore_re ^t/ -ignore ^/home/travis -report coveralls
 
 addons:
   mariadb: '10.3'
