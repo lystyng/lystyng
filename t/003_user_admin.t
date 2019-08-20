@@ -70,10 +70,38 @@ $res = $test->request(POST '/register',
 ok $res, 'Got a response from /register';
 is $res->code, 200, 'Response is 200';
 
+$res = $test->request(POST '/password',
+  Content_type => 'application/json',
+  Content => encode_json({ email => $test_user_data->{email} }),
+);
+
+ok $res, 'Got a response from /password';
+is $res->code, 200, 'Response is 200';
+
+my $user = $sch->resultset('User')->find({
+  username => $test_user_data->{username},
+});
+
+my $code = $user->password_resets->first->code;
+
+$res = $test->request(POST '/passreset',
+  Content_type => 'application/json',
+  Content => encode_json({ 
+    code      => $code,
+    password1 => 'Newpass',
+    password2 => 'Newpass',
+  }),
+);
+
+ok $res, 'Got a response from /passreset';
+is $res->code, 200, 'Response is 200'
+  or diag $res->content;
+
 # Clean up after ourselves
 $test = $sch->resultset('User')->find({
   username => $test_user_data->{username},
 });
+$test->password_resets->delete;
 $test->delete;
 
 done_testing;
