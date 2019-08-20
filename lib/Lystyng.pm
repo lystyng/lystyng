@@ -18,7 +18,7 @@ get '/' => sub {
   send_as html => template 'index.tt';
 };
 
-prefix '/user' => sub {
+prefix '/users' => sub {
   get '' => sub {
     my @users = map { $_->json_data } $model->get_all_users;
     

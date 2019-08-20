@@ -31,9 +31,9 @@ my $test = Plack::Test->create($app);
 
 my %route = (
   ''       => 200,
-  'user'   => 200,
-  'user/test' => 404,
-  'user/test/list/test' => 404,
+  'users'   => 200,
+  'users/test' => 404,
+  'users/test/list/test' => 404,
 );
 
 for (keys %route) {
@@ -45,7 +45,7 @@ for (keys %route) {
 
 my $user = $sch->resultset('User')->create( $test_user_data );
 
-my $res = $test->request(GET '/user/test');
+my $res = $test->request(GET '/users/test');
 is $res->code, 200, 'response status is 200 for /user/test';
 
 $user->delete;
