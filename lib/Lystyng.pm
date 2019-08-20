@@ -240,11 +240,7 @@ post '/register' => sub {
   }
 
   if (@errors) {
-    return {
-      status => 401,
-      message => 'Cannot create user',
-      errors => \@errors,
-    };
+    send_error 'Cannot create user (' . join(', ', @errors) . ')', 401;
   }
 
   # It's only worth checking this stuff if we have a valid set of data
@@ -265,10 +261,7 @@ post '/register' => sub {
   }
 
   if (@errors) {
-    return {
-      status => 403,
-      errors => \@errors,
-    };
+    send_error 'Cannot create user (' . join(', ', @errors) . ')', 403;
   }
 
   delete $user_data->{password2};
@@ -335,19 +328,13 @@ get '/password' => sub {
 
 post '/password' => sub {
   unless (body_parameters->{email}) {
-    return {
-      status => 400,
-      message => 'email address missing',
-    };
+    send_error 'Email address missing', 400;
   }
 
   my $email = lc params->{email};
   my $user = $model->get_user_by_email($email);
   unless ($user) {
-    return {
-      status => 400,
-      message => "$email is not a registered email address",
-    }
+    send_error "$email is not a registered email address", 400;
   }
 
   my $pass_code = passphrase->generate_random({
