@@ -70,6 +70,21 @@ $res = $test->request(POST '/register',
 ok $res, 'Got a response from /register';
 is $res->code, 200, 'Response is 200';
 
+my $user = $sch->resultset('User')->find({
+  username => $test_user_data->{username},
+});
+
+my $verify = $user->verify;
+
+$res = $test->request(GET "/verify/$verify");
+
+ok $res, 'Got a response from /verify';
+is $res->code, 200, 'Response is 200';
+
+# Re-read user from db
+$user->discard_changes;
+ok(! defined $user->verify, 'User is verified');
+
 $res = $test->request(POST '/password',
   Content_type => 'application/json',
   Content => encode_json({ email => $test_user_data->{email} }),
@@ -77,10 +92,6 @@ $res = $test->request(POST '/password',
 
 ok $res, 'Got a response from /password';
 is $res->code, 200, 'Response is 200';
-
-my $user = $sch->resultset('User')->find({
-  username => $test_user_data->{username},
-});
 
 my $code = $user->password_resets->first->code;
 
@@ -98,10 +109,7 @@ is $res->code, 200, 'Response is 200'
   or diag $res->content;
 
 # Clean up after ourselves
-$test = $sch->resultset('User')->find({
-  username => $test_user_data->{username},
-});
-$test->password_resets->delete;
-$test->delete;
+$user->password_resets->delete;
+$user->delete;
 
 done_testing;
