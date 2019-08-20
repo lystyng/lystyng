@@ -1,0 +1,23 @@
+#!/bin/bash
+
+dir=$(dirname "$0")
+# shellcheck source=bin/func_defs
+. "$dir/func_defs"
+
+check_vars
+
+root_user=$1
+root_pass=$2
+
+echo $root_user/$root_pass
+
+mysql -u$root_user -p$root_pass -h$LYSTYNG_DB_HOST <<END_OF_SQL
+create database $LYSTYNG_DB_NAME;
+drop user if exists '$LYSTYNG_DB_USER'@'$LYSTYNG_DB_HOST';
+flush privileges;
+create user '$LYSTYNG_DB_USER'@'$LYSTYNG_DB_HOST' identified by '$LYSTYNG_DB_PASS';
+grant all on $LYSTYNG_DB_NAME.* to '$LYSTYNG_DB_USER'@'$LYSTYNG_DB_HOST';
+END_OF_SQL
+
+mysql -u$root_user -p$root_pass -h$LYSTYNG_DB_HOST -D$LYSTYNG_DB_NAME < db/lystyng.sql
+
