@@ -46,7 +46,7 @@ my $res = $test->request(POST '/register',
 );
 
 ok $res, 'Got a response from /register';
-is $res->code, 200, 'Response is 200';
+is $res->code, 401, 'Response is 401';
 like $res->content, qr[is missing], 'Password2 is missing';
 
 $test_user_data->{password2} = 'Something else';
@@ -57,7 +57,7 @@ $res = $test->request(POST '/register',
 );
 
 ok $res, 'Got a response from /register';
-is $res->code, 200, 'Response is 200';
+is $res->code, 403, 'Response is 403';
 like $res->content, qr[do not match], 'Passwords do not match'
   or diag $res->content;
 
