@@ -25,6 +25,60 @@ prefix '/users' => sub {
     return \@users; 
   };
 
+  post '' => sub {
+    my ($user_data, @errors);
+
+    foreach (qw[username name email password password2]) {
+      if (defined (my $val = body_parameters->get($_))) {
+        $user_data->{$_} = $val;
+      } else {
+        push @errors, qq[Field "$_" is missing];
+      }
+    }
+
+    if (@errors) {
+      send_error 'Cannot create user (' . join(', ', @errors) . ')', 401;
+    }
+
+    # It's only worth checking this stuff if we have a valid set of data
+    if (!@errors) {
+      if ($user_data->{password} ne $user_data->{password2}) {
+        push @errors, 'Your passwords do not match.';
+      }
+
+      my ($old_user) = $model->get_user_by_username($user_data->{username});
+      if ($old_user) {
+        push @errors, "Username '$user_data->{username}' is already in use.";
+      };
+
+      ($old_user) = $model->get_user_by_email($user_data->{email});
+      if ($old_user) {
+        push @errors, "Email address '$user_data->{email}' is already registered.";
+      }
+    }
+
+    if (@errors) {
+      send_error 'Cannot create user (' . join(', ', @errors) . ')', 403;
+    }
+
+    delete $user_data->{password2};
+    $user_data->{verify} = passphrase->generate_random({
+      length  => 32,
+      charset => [ 'a' .. 'z', 'A' .. 'Z', 0 .. 9],
+    });
+
+    my $user = $model->add_user( $user_data );
+
+    $user->send_verify(uri_for('/verify'));
+
+    session user => $user;
+
+    return {
+      status => 201,
+      message => "User '$user_data->{username}' created successfully",
+    };
+  };
+
   get '/:username' => sub {
     my $user = $model->get_user_by_username(
       route_parameters->get('username')
@@ -226,60 +280,6 @@ prefix '/list' => sub {
 
 get '/register' => sub {
   template 'register';
-};
-
-post '/register' => sub {
-  my ($user_data, @errors);
-
-  foreach (qw[username name email password password2]) {
-    if (defined (my $val = body_parameters->get($_))) {
-      $user_data->{$_} = $val;
-    } else {
-      push @errors, qq[Field "$_" is missing];
-    }
-  }
-
-  if (@errors) {
-    send_error 'Cannot create user (' . join(', ', @errors) . ')', 401;
-  }
-
-  # It's only worth checking this stuff if we have a valid set of data
-  if (!@errors) {
-    if ($user_data->{password} ne $user_data->{password2}) {
-      push @errors, 'Your passwords do not match.';
-    }
-
-    my ($old_user) = $model->get_user_by_username($user_data->{username});
-    if ($old_user) {
-      push @errors, "Username '$user_data->{username}' is already in use.";
-    };
-
-    ($old_user) = $model->get_user_by_email($user_data->{email});
-    if ($old_user) {
-      push @errors, "Email address '$user_data->{email}' is already registered.";
-    }
-  }
-
-  if (@errors) {
-    send_error 'Cannot create user (' . join(', ', @errors) . ')', 403;
-  }
-
-  delete $user_data->{password2};
-  $user_data->{verify} = passphrase->generate_random({
-    length  => 32,
-    charset => [ 'a' .. 'z', 'A' .. 'Z', 0 .. 9],
-  });
-
-  my $user = $model->add_user( $user_data );
-
-  $user->send_verify(uri_for('/verify'));
-
-  session user => $user;
-
-  return {
-    status => 201,
-    message => "User '$user_data->{username}' created successfully",
-  };
 };
 
 get '/verify/:code' => sub {

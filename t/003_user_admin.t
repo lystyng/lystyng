@@ -40,34 +40,34 @@ for (keys %route) {
   is( $res->code, $route{$_}, "response status is $route{$_} for /$_" );
 }
 
-my $res = $test->request(POST '/register',
+my $res = $test->request(POST '/users',
   Content_type => 'application/json',
   Content => encode_json($test_user_data),
 );
 
-ok $res, 'Got a response from /register';
+ok $res, 'Got a response from POST /users';
 is $res->code, 401, 'Response is 401';
 like $res->content, qr[is missing], 'Password2 is missing';
 
 $test_user_data->{password2} = 'Something else';
 
-$res = $test->request(POST '/register',
+$res = $test->request(POST '/users',
   Content_type => 'application/json',
   Content => encode_json($test_user_data),
 );
 
-ok $res, 'Got a response from /register';
+ok $res, 'Got a response from POST /users';
 is $res->code, 403, 'Response is 403';
 like $res->content, qr[do not match], 'Passwords do not match'
   or diag $res->content;
 
 $test_user_data->{password2} = 'TEST';
-$res = $test->request(POST '/register', 
+$res = $test->request(POST '/users', 
   Content_type => 'application/json',
   Content => encode_json($test_user_data),
 );
 
-ok $res, 'Got a response from /register';
+ok $res, 'Got a response from POST /users';
 is $res->code, 200, 'Response is 200';
 
 my $user = $sch->resultset('User')->find({
