@@ -30,14 +30,19 @@ my $test_user = $sch->resultset('User')->find({
 });
 $test_user->delete if $test_user;
 
-my $res = $test->request(POST '/register', 
+my $res = $test->request(POST '/users', 
   Content_type => 'application/json',
   Content => encode_json($test_user_data),
 );
 
+ok($res->is_success, 'User created')
+  or diag $res->message;
+
 my $user = $sch->resultset('User')->find({
   username => $test_user_data->{username},
 });
+
+ok($user, 'User found in database');
 
 $res = $test->request(POST "/users/$test_user_data->{username}/lists",
   Content_type => 'application/json',
@@ -49,7 +54,7 @@ $res = $test->request(POST "/users/$test_user_data->{username}/lists",
 );
 
 ok($res, 'Got a response from adding a list');
-is($res->code, 200, 'Status is 200');
+is($res->code, 200, 'Status is 200') or diag $res->message;
 
 my $list = $user->lists->first;
 
