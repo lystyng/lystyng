@@ -2,13 +2,13 @@
 [% IF user.lists.size -%]
 <ul>
 [%   FOREACH list IN user.lists -%]
-<li><a href="/user/[% user.username %]/list/[% list.slug %]">[% list.title %]</a>
+<li><a href="/users/[% user.username %]/lists/[% list.slug %]">[% list.title %]</a>
 <br>[% list.description %]</li>
 [%   END -%]
 [% ELSE -%]
 <p>User has no lists</p>
 [% END -%]
-[% IF session.user AND session.user.username == user.username -%]
+[% IF session.user AND session.user == user.username -%]
 <a href="/list/add"><button type="button" class="btn btn-default btn-lg">
   <span class="glyphicon glyphicon-plus"></span> Add List
 </button></a>

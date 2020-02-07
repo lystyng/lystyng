@@ -1,15 +1,15 @@
 [% fields = [ {
   name  => 'list_title',
   label => 'List Title',
-  placeholder => 'title',
+  placeholder => 'My favourite films',
 }, {
   name  => 'list_slug',
   label => 'Slug',
-  placeholder => 'slug',
+  placeholder => 'my-favourite-films',
 }, {
   name  => 'list_description',
   label => 'Description',
-  placeholder => 'description',
+  placeholder => 'These are the finest films ever made',
 } ] -%]
 
 <h2>Add List</h2>

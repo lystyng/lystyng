@@ -1,79 +1,20 @@
 =head1 NAME
 
-Lystyng - Code for listing things
+Lystyng API - Code for listing things
 
 =cut
 
-package Lystyng;
+package LystyngAPI;
 
 use Dancer2;
 our $VERSION = '0.0.1';
 use Dancer2::Plugin::Auth::Tiny;
 use Dancer2::Plugin::Passphrase;
 use Lystyng::Model;
-use LystyngAPI::Client;
-use URI;
 
 my $model = Lystyng::Model->new;
-my $api = LystyngAPI::Client->new;
 
-hook before => sub {
-  if (my $username = session('user')) {
-    var user => $api->get("/users/$username");
-  }
-};
-
-get '/' => sub {
-  template 'index';
-};
-
-get '/register' => sub {
-  template 'register';
-};
-
-post '/register' => sub {
-  my ($user_data, @errors);
-
-  foreach (qw[username name email password password2]) {
-    if (defined (my $val = body_parameters->get($_))) {
-      $user_data->{$_} = $val;
-    } else {
-      push @errors, qq[Field "$_" is missing];
-    }
-  }
-
-  my $resp = $api->post('/users', $user_data);
-
-  if ($resp->{status} == 403) {
-    return template 'register', { errors => $resp->{message} };
-  }
-
-  session user => $resp->{user};
-
-  redirect uri_for('/users/' . $resp->{user});
-};
-
-get '/login' => sub {
-  template 'login';
-};
-
-post '/login' => sub {
-  my $resp = $api->post(
-    '/login', {
-      username => body_parameters->get('username'),
-      password => body_parameters->get('password'),
-    },
-  );
-
-  if ($resp->{code} == 200) {
-    session user => $resp->{user};
-    redirect uri_for('/users/' . $resp->{user});
-  } else {
-    template 'login', {
-      error    => 1,
-    };
-  }
-};
+set serializer => 'JSON';
 
 prefix '/users' => sub {
   get '' => sub {
@@ -82,10 +23,71 @@ prefix '/users' => sub {
     return \@users;
   };
 
-  get '/:username' => sub {
-    my $resp = $api->get('/users/' . route_parameters->get('username'));
+  post '' => sub {
+    my ($user_data, @errors);
 
-    template 'user', { user => $resp };
+    foreach (qw[username name email password password2]) {
+      if (defined (my $val = body_parameters->get($_))) {
+        $user_data->{$_} = $val;
+      } else {
+        push @errors, qq[Field "$_" is missing];
+      }
+    }
+
+    if (@errors) {
+      send_error 'Cannot create user (' . join(', ', @errors) . ')', 401;
+    }
+
+    # It's only worth checking this stuff if we have a valid set of data
+    if (!@errors) {
+      if ($user_data->{password} ne $user_data->{password2}) {
+        push @errors, 'Your passwords do not match.';
+      }
+
+      my ($old_user) = $model->get_user_by_username($user_data->{username});
+      if ($old_user) {
+        push @errors, "Username '$user_data->{username}' is already in use.";
+      };
+
+      ($old_user) = $model->get_user_by_email($user_data->{email});
+      if ($old_user) {
+        push @errors, "Email address '$user_data->{email}' is already registered.";
+      }
+    }
+
+    if (@errors) {
+      send_error 'Cannot create user (' . join(', ', @errors) . ')', 403;
+    }
+
+    delete $user_data->{password2};
+    $user_data->{verify} = passphrase->generate_random({
+      length  => 32,
+      charset => [ 'a' .. 'z', 'A' .. 'Z', 0 .. 9],
+    });
+
+    my $user = $model->add_user( $user_data );
+
+    $user->send_verify(uri_for('/verify'));
+
+    session user => $user;
+
+    return {
+      status => 201,
+      user   => $user_data->{username},
+    };
+  };
+
+  get '/:username' => sub {
+    my $user = $model->get_user_by_username(
+      route_parameters->get('username')
+    );
+
+    send_error 'User not found', 404 unless $user;
+
+    my $data = $user->json_data;
+    $data->{lists} = [ map { $_->json_data } $model->get_users_lists($user) ];
+
+    return $data;
   };
 
   post '/:username/lists' => sub {
@@ -109,6 +111,7 @@ prefix '/users' => sub {
     return {
       status => '201',
       message => 'List created successfully',
+      list    => "/users/$username/lists/$list_data->{slug}",
     };
   };
 
@@ -116,14 +119,18 @@ prefix '/users' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
 
-    my $resp = $api->get("/users/$username/lists/$listslug");
+    my $user = $model->get_user_by_username($username);
 
-    if ($resp->{status} == 200) {
-      $resp->{username} = $username;
-      template 'list', $resp;
-    } else {
-      die $resp->{message};
-    }
+    send_error 'User not found', 404 unless $user;
+
+    my $list = $model->get_user_list_by_slug($user, $listslug);
+
+    send_error 'List not found', 404 unless $list;
+
+    return {
+      status => 200,
+      list => $list->json_data({ items => 1 }),
+    };
   };
 
   post '/:username/lists/:list/items' => sub {
@@ -267,28 +274,6 @@ warn Dumper $new_list_values;
   };
 };
 
-prefix '/list' => sub {
-  get '/add' => needs login => sub {
-    template 'addlist';
-  };
-
-  post '/add' => sub {
-    my $resp = $api->post(
-      '/users/' . session('user') . '/lists', {
-        title => body_parameters->get('list_title'),
-        slug  => body_parameters->get('list_slug'),
-        description => body_parameters->get('list_description'),
-      },
-    );
-
-    if ($resp->{status} == 403) {
-      template 'addlist', { error => $resp->{message}};
-    } else {
-      redirect uri_for($resp->{list});
-    }
-  };
-};
-
 get '/verify/:code' => sub {
   my $code = route_parameters->get('code');
   my $user = $model->get_user_by_attribute(
@@ -306,13 +291,23 @@ get '/verify/:code' => sub {
   };
 };
 
-get '/logout' => sub {
-  session user => undef;
-  redirect request->referer;
+post '/login' => sub {
+  my ($user) = $model->get_user_by_username(body_parameters->get('username'));
+  if ($user && $user->check_password(body_parameters->get('password'))) {
+    session user => $user;
+    return {
+      code => 200,
+      user => $user->username,
+    };
+  } else {
+    warn "Login unsuccessful";
+    send_error 'Login unsuccessful', 403;
+  }
 };
 
-get '/password' => sub {
-  template 'forgotpass';
+get '/logout' => sub {
+  session user => undef;
+  return { status => 200, message => 'User logged out' };
 };
 
 post '/password' => sub {

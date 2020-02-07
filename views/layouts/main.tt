@@ -8,8 +8,8 @@
     <link rel="icon" type="image/x-icon" href="[% request.uri_base %]/favicon.ico" />
     <link rel="stylesheet" href="[% request.uri_base %]/css/bootstrap.min.css" />
     <link rel="stylesheet" href="[% request.uri_base %]/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link href="css/jumbotron-narrow.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="[% request.uri_base %]/css/style.css">
+    <link href="[% request.uri_base %]/css/jumbotron-narrow.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -43,8 +43,8 @@
             <li><a href="/songs/">Songs</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-           <li><a href="/register">Register</a></li>
-           <li><a href="/login">Login</a></li>
+           <li>[% IF session.user; '<a>' _ session.user _ '</a>'; ELSE %]<a href="/register">Register</a>[% END %]</li>
+	   <li>[% IF session.user %]<a href="/logout">Logout</a>[% ELSE %]<a href="/login">Login</a>[% END %]</li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div>
