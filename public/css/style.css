@@ -1,11 +1,11 @@
 body {
-  background-image: url(../images/background.png);
+/*  background-image: url(../images/background.png);
   background-repeat: no-repeat;
   background-position: center center;
   background-attachment: fixed;
   background-size: cover;
   background-color: black;
-  color: white;
+  color: white; */
   font-family: Roboto, san-serif;
   padding-bottom: 70px;
 }

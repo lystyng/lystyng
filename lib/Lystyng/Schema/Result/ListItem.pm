@@ -54,6 +54,12 @@ __PACKAGE__->table("list_item");
   data_type: 'integer'
   is_nullable: 0
 
+=head2 url
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 500
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -67,6 +73,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "seq_no",
   { data_type => "integer", is_nullable => 0 },
+  "url",
+  { data_type => "varchar", is_nullable => 1, size => 500 },
 );
 
 =head1 PRIMARY KEY
@@ -99,14 +107,15 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07049 @ 2019-08-06 09:22:23
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:dRNbY7YO5MirARKiySS8yg
+# Created by DBIx::Class::Schema::Loader v0.07049 @ 2020-02-20 10:07:24
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:To50OvSvXgCZIq6yrgQRvQ
 
 sub json_data {
   my $self = shift;
 
   return {
     title => $self->title,
+    url => $self->url,
     description => $self->description,
   };
 }

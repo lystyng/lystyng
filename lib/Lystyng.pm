@@ -138,16 +138,23 @@ prefix '/users' => sub {
 
     send_error 'List not found', 404 unless $list;
 
+    my %data = (
+      seq => 'seq_no',
+      title => 'title',
+      url => 'url',
+      desc => 'description',
+    );
+
     my @params;
     for (body_parameters->keys) {
-      /^seq_(\d+)/   and $params[$1]{seq_no}      = body_parameters->get($_);
-      /^title_(\d+)/ and $params[$1]{title}       = body_parameters->get($_);
-      /^desc_(\d+)/  and $params[$1]{description} = body_parameters->get($_);
+      for my $item (keys %data) {
+        /^${item}_(\d+)/ and $params[$1]{$data{$item}} = body_parameters->get($_);
+      }
     }
 
     for (@params) {
       next unless defined;
-      next unless length $_->{title} and length $_->{description};
+      next unless length $_->{title};
 
       my $resp = $api->post(request->path, $_);
     }
@@ -155,7 +162,7 @@ prefix '/users' => sub {
     redirect "/users/$username/lists/$listslug";
   };
 
-  del '/:username/lists/:list/items/:seq_no' => sub {
+  get '/:username/lists/:list/items/:seq_no/delete' => sub {
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
     my $seq      = route_parameters->get('seq_no');
@@ -172,12 +179,9 @@ prefix '/users' => sub {
 
     send_error 'List item not found', 404 unless $item;
 
-    $item->delete;
+    $api->delete("/users/$username/lists/$listslug/items/$seq");
 
-    return {
-      status => 200,
-      message => 'List item deleted successfully',
-    };
+    redirect "/users/$username/lists/$listslug";
   };
 
   patch '/:username/lists/:list' => sub {

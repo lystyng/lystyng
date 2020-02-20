@@ -4,7 +4,7 @@
 [% IF list.items.size -%]
 <ol>
 [%   FOREACH item IN list.items -%]
-<li><h3>[% item.title %]</h3>
+<li><h3>[% IF item.url %]<a href="[% item.url %]">[% END %][% item.title %][% IF item.url %]</a>[% END %][% IF session.user AND session.user == username %]<form class="form-inline" method="get" action="/users/[% username %]/lists/[% list.slug %]/items/[% loop.count %]/delete"><button type="submit" class="btn btn-sm btn-primary">X</button></form>[% END %]</h3>
 <p>[% item.description %]</p></li>
 [%   END -%]
 </ol>
@@ -15,16 +15,17 @@
      IF list.items.size < 10;
        item_no = list.items.size + 1 -%]
 <form method="post" action="/users/[% username %]/lists/[% list.slug %]/items">
+<button type="submit" class="btn btn-primary">Save</button>
 <ol start="[% item_no %]">
-<input type="submit">
 [%     WHILE item_no <= 10 -%]
-  <li><input name="title_[% item_no %]" playholder="title" >
+  <li><div class="form-group"><input name="title_[% item_no %]" placeholder="Title" class="form-control form-control-sm">
   <input type="hidden" name="seq_[% item_no %]" value="[% item_no %]"><br>
-  <textarea rows="4" cols="50" name="desc_[% item_no %]" >[Description goes here]</textarea></li>
+  <input name="url_[% item_no %]" placeholder="Optional URL" class="form-control form-control-sm"><br>
+  <textarea rows="4" cols="50" name="desc_[% item_no %]" placeholder="Optional Description" class="form-control form-control-sm"></textarea></div></li>
 [%       item_no = item_no + 1;
        END -%]
 </ol>
-<input type="submit">
+<button type="submit" class="btn btn-primary">Save</button>
 </form>
 [%   END;
    END -%]

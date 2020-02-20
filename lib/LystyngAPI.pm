@@ -147,7 +147,7 @@ prefix '/users' => sub {
 
     my $item = { map {
       $_ => body_parameters->get($_);
-    } (qw[ seq_no title description ]) };
+    } (qw[ seq_no title url description ]) };
 
     if (!$item->{seq_no}) {
       if ($list->list_items->count) {
@@ -167,6 +167,7 @@ prefix '/users' => sub {
   };
 
   del '/:username/lists/:list/items/:seq_no' => sub {
+    warn "In API delete handler";
     my $username = route_parameters->get('username');
     my $listslug = route_parameters->get('list');
     my $seq      = route_parameters->get('seq_no');
@@ -183,7 +184,15 @@ prefix '/users' => sub {
 
     send_error 'List item not found', 404 unless $item;
 
+    warn "About to delete";
+
     $item->delete;
+
+    for ($list->list_items->search({ seq_no => { '>' => $seq } })) {
+      $_->update({ seq_no => $_->seq_no - 1});
+    }
+
+    warn "BOOM! Done the delete";
 
     return {
       status => 200,

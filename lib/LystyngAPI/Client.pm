@@ -62,4 +62,18 @@ sub post {
   return $self->json->decode($resp->content);
 }
 
+sub delete {
+  my $self = shift;
+  my ($path, $args) = @_;
+
+  if ($args) {
+    my $content = $self->json->encode($args);
+    my $resp = $self->ua->delete($self->api_uri . $path, Content => $content);
+    return $self->json->decode($resp->content);
+  } else {
+    my $resp = $self->ua->delete($self->api_uri . $path);
+    return $self->json->decode($resp->content);
+  }
+}
+
 1;
