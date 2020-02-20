@@ -155,7 +155,7 @@ __PACKAGE__->belongs_to(
 sub json_data {
   my $self = shift;
   my ($include) = @_;
-  
+
   my $data = {
     title => $self->title,
     slug => $self->slug,
@@ -168,12 +168,15 @@ sub json_data {
     ];
   }
 
+use Data::Dumper;
+warn Dumper $data;
+
   return $data;
 }
 
 sub url {
   my $self = shift;
-  
+
   return $self->user->url . '/list/' . $self->slug;
 }
 

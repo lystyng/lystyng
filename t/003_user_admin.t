@@ -32,7 +32,7 @@ $test_user->delete if $test_user;
 my %route = (
   register => 200,
   login    => 200,
-  logout   => 200,
+  logout   => 302,
 );
 
 for (keys %route) {
@@ -40,12 +40,12 @@ for (keys %route) {
   is( $res->code, $route{$_}, "response status is $route{$_} for /$_" );
 }
 
-my $res = $test->request(POST '/users',
+my $res = $test->request(POST '/register',
   Content_type => 'application/json',
   Content => encode_json($test_user_data),
 );
 
-ok $res, 'Got a response from POST /users';
+ok $res, 'Got a response from POST /register';
 is $res->code, 401, 'Response is 401';
 like $res->content, qr[is missing], 'Password2 is missing';
 

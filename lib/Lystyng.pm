@@ -138,25 +138,21 @@ prefix '/users' => sub {
 
     send_error 'List not found', 404 unless $list;
 
-    my $item = { map {
-      $_ => body_parameters->get($_);
-    } (qw[ seq_no title description ]) };
-
-    if (!$item->{seq_no}) {
-      if ($list->list_items->count) {
-        my $max = $list->list_items->get_column('seq_no')->max;
-        $item->{seq_no} = ++$max;
-      } else {
-        $item->{seq_no} = 1;
-      }
+    my @params;
+    for (body_parameters->keys) {
+      /^seq_(\d+)/   and $params[$1]{seq_no}      = body_parameters->get($_);
+      /^title_(\d+)/ and $params[$1]{title}       = body_parameters->get($_);
+      /^desc_(\d+)/  and $params[$1]{description} = body_parameters->get($_);
     }
 
-    $model->add_item_to_user_list($username, $listslug, $item);
+    for (@params) {
+      next unless defined;
+      next unless length $_->{title} and length $_->{description};
 
-    return {
-      status => 201,
-      message => 'List item created successfully',
-    };
+      my $resp = $api->post(request->path, $_);
+    }
+
+    redirect "/users/$username/lists/$listslug";
   };
 
   del '/:username/lists/:list/items/:seq_no' => sub {

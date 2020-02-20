@@ -1,14 +1,30 @@
 <h2>[% list.title %]</h2>
 <p>By <a href="/users/[% username %]">[% username %]</a></p>
 <p>[% list.description %]</p>
-[% IF list.list_items.size -%]
-<ul>
-[%   FOREACH item IN list.list_items -%]
+[% IF list.items.size -%]
+<ol>
+[%   FOREACH item IN list.items -%]
 <li><h3>[% item.title %]</h3>
 <p>[% item.description %]</p></li>
 [%   END -%]
+</ol>
 [% ELSE -%]
 <p>List has no items</p>
-[%   IF session.user AND session.user == username -%]
-[%   END -%]
 [% END -%]
+[% IF session.user AND session.user == username;
+     IF list.items.size < 10;
+       item_no = list.items.size + 1 -%]
+<form method="post" action="/users/[% username %]/lists/[% list.slug %]/items">
+<ol start="[% item_no %]">
+<input type="submit">
+[%     WHILE item_no <= 10 -%]
+  <li><input name="title_[% item_no %]" playholder="title" >
+  <input type="hidden" name="seq_[% item_no %]" value="[% item_no %]"><br>
+  <textarea rows="4" cols="50" name="desc_[% item_no %]" >[Description goes here]</textarea></li>
+[%       item_no = item_no + 1;
+       END -%]
+</ol>
+<input type="submit">
+</form>
+[%   END;
+   END -%]
