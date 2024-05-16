@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ ! -f .env ]] ; then
+    echo 'Cannot run without a .env file. Aborting.'
+    exit
+fi
+
+. .env
+
+plackup -D bin/app.psgi
+plackup -D -p $LYSTYNG_API_PORT bin/api.psgi
