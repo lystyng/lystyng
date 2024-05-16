@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Daemon::Control;
+
+use Cwd qw(abs_path);
+use File::Basename;
+
+my $abs_path = abs_path($0);
+my $abs_dir  = dirname($0);
+
+Daemon::Control->new({
+  name      => 'Lystyng',
+  lsb_start => '$syslog $remote_fs',
+  lsb_stop  => '$syslog',
+  lsb_sdesc => 'AdServer',
+  lsb_desc  => 'AdServer',
+  path      => $abs_path,
+
+  program      => '/usr/bin/starman',
+  program_args => [ '--workers', 10, '-l', ':1757',
+                    "$abs_dir/bin/app.psgi" ],
+
+  user  => 'lystyng',
+  group => 'psacln',
+
+  pid_file    => '/var/run/lystyng.pid',
+  stderr_file => '/var/log/lystyng/error.log',
+  stdout_file => '/var/log/lystyng/output.log',
+
+  fork => 2,
+})->run;
