@@ -14,8 +14,8 @@ Daemon::Control->new({
   name      => 'Lystyng',
   lsb_start => '$syslog $remote_fs',
   lsb_stop  => '$syslog',
-  lsb_sdesc => 'AdServer',
-  lsb_desc  => 'AdServer',
+  lsb_sdesc => 'Lystyng',
+  lsb_desc  => 'Lystyng',
   path      => $abs_path,
 
   program      => '/usr/bin/starman',
